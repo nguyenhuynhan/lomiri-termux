@@ -12,12 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install validation dependencies
-        run: apt-get update && apt-get install -y --no-install-recommends bash python3 g++ pkg-config qtbase5-dev
+        run: apt-get update && apt-get install -y --no-install-recommends bash python3 g++ pkg-config qtbase5-dev xvfb x11-xserver-utils
       - name: Shell syntax and session ownership
         run: |
           mkdir -p runtime
           for script in scripts/*.sh; do bash -n "$script"; done
           python3 tests/session-lifecycle.py
+      - name: Owned display viewport changes
+        run: python3 tests/display-sync.py
       - name: Real Qt mouse delivery
         run: |
           g++ -Wall -Wextra -shared -fPIC -O2 -Wl,--version-script=src/qt-mouse-dispatch.map -o runtime/input-bridge.so src/qt-mouse-dispatch-compat.cpp $(pkg-config --cflags --libs Qt5Gui) -ldl

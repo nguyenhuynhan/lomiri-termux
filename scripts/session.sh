@@ -3,9 +3,13 @@ source "$(dirname -- "$0")/common.sh"
 python "$PROJECT_ROOT/scripts/session-state.py" register
 child_pid=''
 server_pid=''
+launcher_pid=''
+sync_pid=''
 cleanup() {
   if [[ -n "$child_pid" ]]; then kill -TERM "$child_pid" 2>/dev/null || true; fi
   if [[ -n "$server_pid" ]]; then kill -TERM "$server_pid" 2>/dev/null || true; fi
+  if [[ -n "$launcher_pid" ]]; then kill -TERM "$launcher_pid" 2>/dev/null || true; fi
+  if [[ -n "$sync_pid" ]]; then kill -TERM "$sync_pid" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
 trap 'exit 143' TERM
@@ -26,6 +30,8 @@ if [[ "${LOMIRI_DIRECT:-0}" == 1 ]]; then
   sleep 2
   LOMIRI_X11_OUTPUT=$(DISPLAY="$LOMIRI_DISPLAY" xrandr --current | sed -n 's/.*current \([0-9]*\) x \([0-9]*\),.*/\1x\2/p' | head -n 1)
   [[ -n "$LOMIRI_X11_OUTPUT" ]] || { echo 'Direct X11 server is not ready.' >&2; exit 2; }
+  python "$PROJECT_ROOT/scripts/display-sync.py" "$LOMIRI_DISPLAY" > "$PROJECT_ROOT/runtime/display-sync.log" 2>&1 &
+  sync_pid=$!
 fi
 guest /usr/bin/env DISPLAY="$LOMIRI_DISPLAY" LOMIRI_SOFTWARE_RENDERING="$LOMIRI_SOFTWARE_RENDERING" \
   LOMIRI_TRACE="${LOMIRI_TRACE:-0}" \
@@ -34,4 +40,7 @@ guest /usr/bin/env DISPLAY="$LOMIRI_DISPLAY" LOMIRI_SOFTWARE_RENDERING="$LOMIRI_
   LOMIRI_DIRECT="${LOMIRI_DIRECT:-0}" LOMIRI_X11_OUTPUT="${LOMIRI_X11_OUTPUT:-480x800}" \
   /bin/bash "$LOMIRI_GUEST_ROOT/scripts/guest-session.sh" &
 child_pid=$!
+guest /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  python3 "$LOMIRI_GUEST_ROOT/scripts/guest-work-apps.py" > "$PROJECT_ROOT/runtime/work-apps-launcher.log" 2>&1 &
+launcher_pid=$!
 wait "$child_pid"
