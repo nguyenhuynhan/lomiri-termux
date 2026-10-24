@@ -19,6 +19,8 @@ bash scripts/build-input-compat.sh
 
 The build runs a real Qt window delivery test before recording package versions and the library hash. Without the bridge, that test must reproduce missing mouse delivery. Input/graphics changes also need an actual Lomiri session; offscreen tests alone do not prove device usability.
 
+CI uses an ARM64 runner, matching the phone's target ABI. Qt's internal symbol interposition can differ by architecture/build; x86 compatibility is not established.
+
 For lifecycle changes, confirm that stop/start affects only this experiment and an unrelated display still responds. Report exact versions and remaining limitations in the pull request.
 
 ## Useful next steps
