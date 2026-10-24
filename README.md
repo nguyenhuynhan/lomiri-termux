@@ -41,13 +41,46 @@ Trong **Hello Lomiri**, chạm nút để tăng số; chạm ô nhập rồi dù
 
 Bản vá input riêng cho dự án đã làm click và nhập chữ hoạt động trong các phép thử. Đã kiểm tra cả X11 click/type và thao tác qua Android, gồm phím trên Gboard. Ngày 24/10/2026, người dùng thử trực tiếp trên OnePlus 13 và xác nhận “Chạm và nhập đều được”. Một số lần chạm ADB cực ngắn không được ghi nhận; độ ổn định khi dùng lâu vẫn cần đánh giá.
 
+## VSCode và ChatGPT
+
+Đã chạy Microsoft VSCode ARM64 **1.143.1** và Firefox ESR **153.5.1** như Wayland client trong Lomiri. Phép thử đã sửa/lưu `hello.py` qua giao diện VSCode rồi chạy Python trong terminal tích hợp. ChatGPT web đã nhận `2+2` và trả lời `4` trong Firefox, chưa đăng nhập tài khoản.
+
+Trên điện thoại đã cài xong, dùng:
+
+```bash
+lomiri-code
+lomiri-chatgpt
+```
+
+Alt+Tab đổi cửa sổ; nút ô vuông trên thanh tiêu đề của Lomiri phóng to app. Shortcut Android có tên **VSCode (Lomiri)** và **ChatGPT (Lomiri)**.
+
+Trên máy mới:
+
+```bash
+cd ~/projects/lomiri-termux
+bash scripts/install-work-apps.sh
+bash scripts/install-shortcuts.sh
+lomiri-stop
+lomiri-code --no-sandbox
+lomiri-chatgpt
+```
+
+VSCode trong PRoot đã thử cần `--no-sandbox`, làm giảm sandbox của Electron. Điện thoại đã cấu hình `LOMIRI_CODE_NO_SANDBOX=1` trong `config.env`; mã nguồn giữ mặc định 0 để người dùng tự chọn. Firefox dùng cấu hình sandbox mặc định. Android vẫn quản lý quyền của Termux.
+
+Profile, extension và thư mục code thử nằm trong `runtime/`; không nhập thông tin đăng nhập của desktop cũ. Kiểm tra nội dung trước khi chấp nhận Workspace Trust của VSCode cho thư mục thử `runtime/code-workspace`. Bạn tự đăng nhập ChatGPT trong Firefox khi cần dùng tài khoản riêng.
+
+Broker chỉ nhận tên hai app này và khởi động chúng trong process group riêng của phiên. `lomiri-stop` đã dừng các tiến trình app/phiên được ghi nhận, giữ desktop X1 còn đáp ứng.
+
+Để giữ sáng khi rời điện thoại: Preferences của Termux:X11 → **Screen idle timeout → Never (keep screen on)**, rồi để X11 ở phía trước. Rời X11, khóa bằng nút nguồn hoặc đổi lại **System** để điện thoại nghỉ. Luôn sáng tốn pin hơn, nên cắm sạc khi để lâu.
+
 ## Trạng thái và giới hạn
 
 - Đã thấy shell, launcher/drawer, app Qt/Wayland và nhập chữ trong phiên bình thường, không tải QML chẩn đoán.
 - Người dùng đã xác nhận chạm nút và nhập chữ đều hoạt động bằng thao tác trực tiếp trên điện thoại.
 - Đã dừng X server riêng, khởi động lại và gọi start hai lần mà không tạo phiên trùng; `:1` vẫn kết nối được.
 - Ba test bảo vệ danh tính tiến trình đã qua. Test Qt thật kiểm tra press/release, tọa độ có phần thập phân và việc giữ nguyên các receiver khác; bỏ bản vá thì test tái hiện lỗi mất click.
-- Android X11 tự xoay, nhưng layout/maximize/resize của Lomiri và app chưa hoàn thiện. Đã gặp một lần màn hình đen khi mở bàn phím đổi kích thước output; chưa kết luận đã xử lý triệt để. Nếu mắc kẹt, lưu việc nếu có thể rồi stop/start phiên.
+- Có bridge đồng bộ cửa sổ Mir với kích thước X11 bằng sự kiện, kiểm chứng bằng Xvfb cả viewport, cửa sổ khác và state cũ. Đã đóng task Android cũ trùng tag làm sai cửa sổ hiển thị; script thống nhất URI có scheme. Rotation/layout đầy đủ và dùng lâu vẫn cần đánh giá.
+- Một số chuỗi phím/chạm tự động quá nhanh bị mất dưới software rendering; giảm tốc độ đã hoàn tất thử nghiệm. Chưa xác nhận độ tin cậy của mọi kiểu nhập trong các app desktop.
 - Chưa kiểm chứng nhập tiếng Việt có dấu, gesture/scroll đầy đủ hoặc launcher mở mọi app qua systemd user services.
 - Render bằng CPU llvmpipe; chưa tối ưu GPU và pin. Đây là PoC Lomiri, chưa phải Ubuntu Touch hoàn chỉnh hay desktop làm việc ổn định.
 

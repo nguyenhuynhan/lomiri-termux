@@ -54,3 +54,17 @@ Mã upstream đã đọc chỉ để đối chiếu; chưa sửa hay build lại
 - Người dùng trả lời “Chạm và nhập đều được” sau khi thử nút Chạm thử và ô nhập trong Hello Lomiri trên OnePlus 13.
 - Cập nhật trạng thái: input cơ bản đã được xác nhận bằng thao tác trực tiếp của người dùng, ngoài bằng chứng tự động trước đó.
 - Xác nhận này chưa bao phủ tiếng Việt có dấu, gesture/scroll, resize/rotation, dùng lâu hoặc pin/GPU.
+
+## 2026-10-24 — ứng dụng làm việc và repo cộng đồng
+
+- Repo public nguyenhuynhan/lomiri-termux đã tạo và nhận mã nguồn, MIT license cho code gốc, hướng dẫn tiếng Anh/Vietnamese và CONTRIBUTING. Gitleaks không phát hiện secret; không đưa runtime/profile/screenshot thô lên Git.
+- CI đầu trên x86 không interpose được Qt notifier nội bộ; chuyển sang ARM64 đúng target. CI ARM64 đã qua ownership tests, real Qt input test và test viewport với Xvfb (resize, cửa sổ khác, stale owner).
+- Cài Microsoft VSCode ARM64 1.143.1-1792691836 từ vendor, đối chiếu SHA256 với API release chính thức. Cài Firefox ESR 153.5.1esr-1~deb13u1 từ Debian. Không nhập profile của workstation cũ.
+- Broker Unix socket riêng chỉ khởi động code/chatgpt; process app thuộc PGID của phiên. Thử dừng đã xác nhận 37 process ghi nhận thoát, X1 còn đáp ứng. Đã khởi động lại app sau đó.
+- Thêm bridge X11 theo sự kiện để đồng bộ cửa sổ host Mir với viewport. Chỉ thao tác trong phiên direct đã xác thực owner, không thay cửa sổ khi root có nhiều child.
+- Đã đóng Android task cũ tạo bằng URI trần cùng tag. Cửa sổ canonical hiện hiển thị đúng trên điện thoại, không còn nền Settings lọt vào lần kiểm tra đó.
+- VSCode khởi động cần --no-sandbox trong PRoot; Firefox chạy với cấu hình mặc định. Profile/HOME/cache app mới ở runtime riêng. Người dùng tự chấp nhận Workspace Trust cho thư mục hello.py thử.
+- Phép thử GUI đã sửa/lưu hello.py thành print("Lomiri VSCode works"), rồi terminal tích hợp chạy python3 hello.py và hiện đúng output. Microsoft Python extension đã hiện được cài trong profile riêng.
+- Một số phím/chạm tiêm quá nhanh bị mất; dùng nhịp chậm hơn hoàn tất thử nghiệm. Alt+Tab và nút maximize của Lomiri hoạt động cho các cửa sổ đã thử.
+- ChatGPT web chạy trong Firefox Wayland, gửi 2+2 và nhận 2 + 2 = 4 khi chưa đăng nhập; không kiểm tra phiên tài khoản hay nhập tiếng Việt có dấu.
+- Theo yêu cầu giữ phone không khóa khi đi lâu, đặt Screen idle timeout của Termux:X11 thành Never (keep screen on), đã đọc lại giá trị. Cần để X11 ở phía trước; vẫn khóa bằng nút nguồn được. Không đo pin/GPU.

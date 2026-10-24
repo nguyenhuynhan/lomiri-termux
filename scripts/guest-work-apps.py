@@ -44,7 +44,8 @@ def launch(app, no_sandbox):
         if not settings.exists():
             settings.write_text(json.dumps({'telemetry.telemetryLevel': 'off',
                 'workbench.startupEditor': 'none', 'editor.fontSize': 16,
-                'terminal.integrated.fontSize': 16, 'window.titleBarStyle': 'custom'}))
+                'terminal.integrated.fontSize': 16, 'window.titleBarStyle': 'custom',
+                'window.newWindowDimensions': 'maximized'}))
         workspace = runtime / 'code-workspace'
         workspace.mkdir(parents=True, exist_ok=True)
         example = workspace / 'hello.py'

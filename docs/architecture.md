@@ -34,3 +34,11 @@ Bridge được build trong guest và chỉ preload vào Lomiri. Test offscreen 
 - Mặc định không dùng QML copy, input probe hoặc crash handler. Chẩn đoán là tùy chọn.
 - Android quản lý khóa màn hình và vòng đời app; không có Linux suspend/hibernate thực sự qua PRoot.
 - Không lấy wake lock. CPU rendering, pin, gesture và adaptive layout chưa đạt mức desktop dùng hằng ngày.
+
+## Broker và viewport hiện tại
+
+Broker Python tạo socket riêng trong runtime, chỉ chấp nhận hai tên app code/chatgpt. Nó được supervisor khởi động trong cùng process group, kiểm tra PGID trước khi nhận yêu cầu và spawn Wayland clients trong group đó. DISPLAY và các preload/library path của host được bỏ khỏi môi trường client; HOME/profile được cách ly trong runtime. VSCode dùng opt-in no-sandbox cho PRoot, Firefox giữ cấu hình mặc định.
+
+Native display-sync.py xác thực owner bằng session-state, dùng X11 Structure/Substructure notifications để theo dõi root và đồng bộ đúng một host window. Nó không polling và dừng khi ownership thay đổi. Test Xvfb kiểm chứng resize, không sửa nhiều cửa sổ và bỏ qua state cũ; test này không thay thế việc kiểm tra mọi kiểu xoay/IME trên điện thoại.
+
+Các task Android trùng tag nhưng khác data URI có thể giữ activity cũ không còn hiển thị đúng. Dùng URI canonical từ đầu; lần thử trên máy đã đóng task trùng tạo trong quá trình chẩn đoán. Không tự xóa task Android theo ID cố định trong script phát hành.

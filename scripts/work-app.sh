@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 source "$(dirname -- "$0")/common.sh"
 python "$PROJECT_ROOT/scripts/session-state.py" status >/dev/null || { echo 'Start Lomiri first.' >&2; exit 2; }
+if [[ "${1:-}" == code && "$#" == 1 && "$LOMIRI_CODE_NO_SANDBOX" == 1 ]]; then set -- code --no-sandbox; fi
 python - "$PROJECT_ROOT/runtime/work-apps.sock" "$@" <<'PY'
 import json, socket, sys
 if len(sys.argv) < 3 or sys.argv[2] not in ('code', 'chatgpt'):

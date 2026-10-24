@@ -2,7 +2,7 @@
 set -euo pipefail
 PROJECT_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 declare -A command_overrides=()
-for name in LOMIRI_DISTRO LOMIRI_USER LOMIRI_DISPLAY LOMIRI_SOFTWARE_RENDERING LOMIRI_MOUSE_COMPAT LOMIRI_INPUT_TRACE; do
+for name in LOMIRI_DISTRO LOMIRI_USER LOMIRI_DISPLAY LOMIRI_SOFTWARE_RENDERING LOMIRI_MOUSE_COMPAT LOMIRI_INPUT_TRACE LOMIRI_CODE_NO_SANDBOX; do
   if [[ -v "$name" ]]; then command_overrides[$name]=${!name}; fi
 done
 if [[ -f "$PROJECT_ROOT/config.env" ]]; then source "$PROJECT_ROOT/config.env"; fi
@@ -13,6 +13,7 @@ LOMIRI_DISPLAY=${LOMIRI_DISPLAY:-:1}
 LOMIRI_SOFTWARE_RENDERING=${LOMIRI_SOFTWARE_RENDERING:-1}
 LOMIRI_MOUSE_COMPAT=${LOMIRI_MOUSE_COMPAT:-1}
 LOMIRI_INPUT_TRACE=${LOMIRI_INPUT_TRACE:-0}
+LOMIRI_CODE_NO_SANDBOX=${LOMIRI_CODE_NO_SANDBOX:-0}
 LOMIRI_GUEST_ROOT=/home/dev/projects/lomiri-termux
 PREFIX=${PREFIX:-/data/data/com.termux/files/usr}
 export PATH="${HOME}/bin:$PREFIX/bin:/system/bin:$PATH"

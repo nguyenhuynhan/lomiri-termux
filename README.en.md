@@ -46,6 +46,26 @@ lomiri-stop
 
 Stopping validates PID, start time, process group, and command identity before signalling only this experiment's group. An existing XFCE display `:1` stays available. No wake lock or Android boot startup is added. Locking Android is not Linux hibernation; Android may terminate background processes.
 
+## Work applications
+
+Microsoft VSCode ARM64 1.143.1 and Firefox ESR 153.5.1 have been device-tested as Wayland clients. The editor saved a Python file and its integrated terminal ran it. ChatGPT web accepted `2+2` and answered `4` without signing in.
+
+```bash
+bash scripts/install-work-apps.sh
+bash scripts/install-shortcuts.sh
+lomiri-stop
+lomiri-code --no-sandbox
+lomiri-chatgpt
+```
+
+The tested PRoot setup needed VSCode's `--no-sandbox`, reducing Electron's sandbox. This remains opt-in by default; the tested phone enables `LOMIRI_CODE_NO_SANDBOX=1` privately. Firefox keeps its default sandbox configuration. App profiles, extension data and the scratch workspace stay in `runtime/`; existing credentials are not imported.
+
+Review the scratch folder before accepting Workspace Trust. The local broker starts only these two apps in the owned session process group; stopping the recorded application/session processes was device-tested. It accepts no arbitrary shell command.
+
+Launch with `lomiri-code`, `lomiri-chatgpt` or the corresponding Widget shortcuts. Use Alt+Tab to switch and Lomiri's titlebar square to maximize. Sign in to your account manually when needed; see the [official web quickstart](https://learn.chatgpt.com/docs/web).
+
+To keep the display awake, choose **Screen idle timeout → Never (keep screen on)** in Termux:X11 preferences and leave X11 in front. It uses more battery. Restore **System**, leave X11 or lock the phone to let it rest.
+
 ## Local Qt input bridge
 
 The tested QtMir package posts mouse events to a plain `QtEventFeeder` QObject. A local preload library routes only that receiver's mouse events to the shell QWindow through Qt5's input interface. It preserves fractional coordinates, buttons, and modifiers; other receivers retain their original dispatch path.
@@ -56,7 +76,7 @@ System Qt libraries are not replaced. The bridge uses a private ABI; package ver
 
 The tested stack is Debian trixie ARM64, Lomiri 0.5.0-2, Mir 2.20.2-2, QtMir 0.8.0~git20250407.ea2f477-1+deb13u1, Qt 5.15.15, and Mesa llvmpipe 25.0.7. Safe stop/restart and idempotent start were tested on the phone. A real Qt window test reproduces missing mouse delivery without the bridge and passes with it.
 
-Keyboard/output resize can produce a black screen. Adaptive rotation/maximization, gestures, scrolling, Vietnamese IME composition, systemd-based app launch, GPU performance, battery use, and long-term stability require more work. Software rendering is the current baseline. An older Ubuntu 24.04 QtMir/Mir stack crashed in `PlatformScreen::makeCurrent`; the separate Debian stack passed that rendering stage.
+An event-driven bridge follows the owned X display's viewport, with Xvfb tests for resize, unrelated windows and stale ownership. A duplicate Android task with the same tag was removed during device verification. Full rotation/layout behavior, gestures, scrolling, Vietnamese composition, GPU performance, battery use and long-term stability still require work. Fast injected input sometimes lost characters; slower pacing completed the desktop-app tests. Software rendering remains the baseline. The older Ubuntu stack's rendering crash remains documented.
 
 Runtime logs, profiles, configuration, and built libraries stay in ignored `runtime/` or `config.env`. Read the [architecture](docs/architecture.md), [experiment log in Vietnamese](docs/progress.md), and [contribution guide](CONTRIBUTING.md).
 
