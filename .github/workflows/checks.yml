@@ -1,0 +1,28 @@
+name: Project checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install validation dependencies
+        run: apt-get update && apt-get install -y --no-install-recommends bash python3 g++ pkg-config qtbase5-dev
+      - name: Shell syntax and session ownership
+        run: |
+          mkdir -p runtime
+          for script in scripts/*.sh; do bash -n "$script"; done
+          python3 tests/session-lifecycle.py
+      - name: Real Qt mouse delivery
+        run: |
+          g++ -Wall -Wextra -shared -fPIC -O2 -Wl,--version-script=src/qt-mouse-dispatch.map -o runtime/input-bridge.so src/qt-mouse-dispatch-compat.cpp $(pkg-config --cflags --libs Qt5Gui) -ldl
+          g++ -Wall -Wextra -fPIC -O2 -o runtime/input-test tests/input-compat.cpp $(pkg-config --cflags --libs Qt5Gui)
+          QT_QPA_PLATFORM=offscreen LD_PRELOAD="$PWD/runtime/input-bridge.so" runtime/input-test
+          if QT_QPA_PLATFORM=offscreen runtime/input-test; then
+            echo 'Expected the unpatched baseline to reproduce missing mouse delivery.' >&2
+            exit 1
+          fi

@@ -1,0 +1,5 @@
+runtime/
+config.env
+*.tar.gz
+__pycache__/
+docs/*.png
