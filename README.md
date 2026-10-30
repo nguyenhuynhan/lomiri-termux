@@ -87,6 +87,21 @@ Nút **Mobile / PC** ở mép phải dock hiển thị chế độ hiện tại;
 
 Đã thử tạo/lưu/chạy Python trong VSCode và kết nối audio tới Termux. Tiếng Việt có dấu qua Laban Key còn lỗi; media, báo thức, dịch vụ phần cứng và độ ổn định dài hạn chưa được coi là hoàn thiện. Xem [báo cáo kiểm chứng hiện tại](docs/verification-20261030.md). Các mục dưới bao gồm cả kết quả lịch sử.
 
+## Cài đặt phiên Lomiri
+
+Ứng dụng **Settings / Cài đặt** tùy chỉnh Mobile/PC, giao diện sáng/tối, cỡ shell,
+hiệu ứng làm mờ, kích thước dock, app ghim, hình nền và phím tắt. Cấu hình lưu
+trong `runtime/config` của dự án. Cỡ shell không thay cỡ chữ VSCode/Firefox.
+F8 mở danh sách app, F9 đổi Mobile/PC; có thể chuyển sang Ctrl+Alt+D/M trong app.
+Bộ chọn hình nền duyệt ảnh trong Debian hoặc đường dẫn đã bind vào guest.
+
+Khi cập nhật mã trên điện thoại, lưu việc trước rồi `lomiri-stop`, `lomiri-start`.
+Settings được thêm vào dock một lần, giữ các app ghim hiện có. Trên máy mới chạy
+`bash scripts/install-core-apps.sh` trước. Wi‑Fi, Bluetooth, độ sáng, âm lượng và
+quyền ứng dụng chỉnh trong Cài đặt Android.
+
+Xem kiểm chứng và các phần còn chờ thử ở [báo cáo Settings](docs/settings-20261030.md).
+
 ## Trạng thái và giới hạn
 
 - Đã thấy shell, launcher/drawer, app Qt/Wayland và nhập chữ trong phiên bình thường, không tải QML chẩn đoán.

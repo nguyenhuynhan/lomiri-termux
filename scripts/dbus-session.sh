@@ -4,7 +4,7 @@ project=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
 python3 - "$project/runtime/guest-session-env.json" <<'PY'
 import json, os, sys
 from pathlib import Path
-keys = ['DBUS_SESSION_BUS_ADDRESS', 'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME', 'DISPLAY', 'PULSE_SERVER', 'PULSE_COOKIE']
+keys = ['DBUS_SESSION_BUS_ADDRESS', 'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME', 'GSETTINGS_SCHEMA_DIR', 'DISPLAY', 'PULSE_SERVER', 'PULSE_COOKIE']
 p = Path(sys.argv[1])
 p.write_text(json.dumps({k: os.environ[k] for k in keys if k in os.environ}))
 p.chmod(0o600)
@@ -37,6 +37,18 @@ if [[ "${LOMIRI_DIRECT:-0}" == 1 ]]; then
   if [[ ! -f "$project/runtime/core-launcher-v1" ]]; then
     gsettings set com.lomiri.Shell.Launcher items "['application:///lomiri-terminal-app.desktop', 'application:///lomiri-filemanager-app.desktop', 'application:///lomiri-chatgpt.desktop', 'application:///lomiri-code.desktop', 'application:///lomiri-calculator-app.desktop']"
     touch "$project/runtime/core-launcher-v1"
+  fi
+  if [[ ! -f "$project/runtime/settings-launcher-v1" ]]; then
+    python3 - <<'PY'
+from gi.repository import Gio
+settings = Gio.Settings.new('com.lomiri.Shell.Launcher')
+items = settings.get_strv('items')
+uri = 'application:///lomiri-session-settings.desktop'
+if uri not in items:
+    settings.set_strv('items', items + [uri])
+    Gio.Settings.sync()
+PY
+    touch "$project/runtime/settings-launcher-v1"
   fi
   args+=("--qmlfile=$project/runtime/host-qml/ShellApplication.qml")
 fi

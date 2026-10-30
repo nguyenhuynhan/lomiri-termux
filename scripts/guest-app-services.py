@@ -29,7 +29,7 @@ ALLOWED = {
     'lomiri-terminal-app', 'lomiri-filemanager-app', 'lomiri-calculator-app',
     'lomiri-clock-app', 'lomiri-calendar-app', 'lomiri-gallery-app',
     'lomiri-mediaplayer-app', 'firefox-esr', 'com.microsoft.VSCode',
-    'lomiri-code', 'lomiri-chatgpt',
+    'lomiri-code', 'lomiri-chatgpt', 'lomiri-session-settings',
 }
 
 
@@ -158,9 +158,12 @@ class AppServices(dbus.service.Object):
         expected = {
             'com.microsoft.VSCode': '/usr/share/code/code', 'lomiri-code': '/usr/share/code/code',
             'firefox-esr': '/usr/bin/firefox-esr', 'lomiri-chatgpt': '/usr/bin/firefox-esr',
+            'lomiri-session-settings': '/usr/bin/python3',
         }.get(app, '/usr/bin/' + app)
         if resolved != Path(expected).resolve():
             raise Rejected(f'Unexpected executable for {app}: {binary}')
+        if app == 'lomiri-session-settings' and args != [str(binary), str(ROOT / 'scripts/guest-settings.py')]:
+            raise Rejected('Only the project Settings script is supported')
         env = os.environ.copy()
         env.update(requested)
         for key in ('DISPLAY', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'MIR_SOCKET', 'ELECTRON_RUN_AS_NODE'):

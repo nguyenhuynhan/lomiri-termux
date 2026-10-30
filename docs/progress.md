@@ -1,5 +1,19 @@
 # Nhật ký kiểm chứng
 
+## Settings — 2026-10-30
+
+- Thêm Settings riêng cho phiên PRoot, schema private, desktop entry và giới hạn
+  executable/script trong app services. Bộ chọn hình nền không cần native dialog.
+- Đã mở Qt/Wayland client trên OnePlus 13, thử mode, theme, cỡ giao diện, ghim app,
+  hình nền và lưu phím tắt. Sửa Binding loop, icon field và cỡ chỉ lưu mà chưa relayout.
+- Sau khi người dùng xác nhận lưu việc, đã restart, mở Settings từ menu/dock,
+  kiểm tra cỡ dock/shell, phím tắt, ngang/dọc, ảnh lỗi và reset/cancel. Mở lại Code;
+  probe Settings giữ unit Code, test ownership hiện có và Xvfb shell đều qua.
+- Xvfb tìm thêm lỗi wizard thiếu module cập nhật và workspace item null lúc
+  init; sửa trong overlay. CLI UAL gọi lại Settings có thể chờ resume handshake;
+  menu/dock đã kiểm tra chuyển cửa sổ cùng PID. Không báo CLI resume là hoàn thiện.
+  Chi tiết và giới hạn trong `docs/settings-20261030.md`.
+
 ## 2026-10-24
 
 - Ghép nối và kết nối ADB với OnePlus 13 thành công.

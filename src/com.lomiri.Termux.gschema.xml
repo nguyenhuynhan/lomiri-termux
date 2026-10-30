@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.lomiri.Termux" path="/com/lomiri/termux/">
+    <key name="ui-scale" type="d">
+      <default>1.0</default><range min="0.85" max="1.25"/>
+      <summary>Scale of this private Lomiri shell and Settings app</summary>
+    </key>
+    <key name="dock-height" type="u">
+      <default>7</default><range min="6" max="10"/>
+      <summary>Bottom dock height in grid units</summary>
+    </key>
+    <key name="drawer-shortcut" type="s">
+      <default>'F8'</default><choices><choice value="F8"/><choice value="Ctrl+Alt+D"/></choices>
+      <summary>Shortcut for the application drawer</summary>
+    </key>
+    <key name="mode-shortcut" type="s">
+      <default>'F9'</default><choices><choice value="F9"/><choice value="Ctrl+Alt+M"/></choices>
+      <summary>Shortcut to switch Mobile and PC</summary>
+    </key>
+  </schema>
+</schemalist>

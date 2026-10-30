@@ -2,6 +2,7 @@
 """Build a private QML overlay: Android owns rotation; Lomiri follows viewport."""
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 
@@ -57,10 +58,16 @@ greeter.write_text(text)
 
 application = target / 'ShellApplication.qml'
 text = application.read_text()
+text = text.replace('import QtQuick 2.15', 'import QtQuick 2.15\nimport Lomiri.Components 1.3\nimport GSettings 1.0')
 before = '    id: root'
 if text.count(before) != 1:
     raise RuntimeError('Unsupported ShellApplication revision')
-text = text.replace(before, before + '\n    property Timer hostReadyTimer: Timer {\n'
+text = text.replace(before, before + '\n    property GSettings hostPreferences: GSettings { schema.id: "com.lomiri.Termux" }\n'
+                    '    Component.onCompleted: units.gridUnit = 8 * root.hostPreferences.uiScale\n'
+                    '    property Connections hostScaleWatcher: Connections {\n'
+                    '        target: root.hostPreferences\n'
+                    '        function onChanged(key, value) { units.gridUnit = 8 * root.hostPreferences.uiScale; }\n    }\n'
+                    '    property Timer hostReadyTimer: Timer {\n'
                     '        interval: 500; running: true; repeat: false\n'
                     '        onTriggered: console.log("LOMIRI_SHELL_READY")\n    }')
 application.write_text(text)
@@ -75,7 +82,10 @@ def replace_once(text, before, after):
 shutil.copyfile(root / 'src/HostDock.qml', target / 'HostDock.qml')
 shell = target / 'Shell.qml'
 text = shell.read_text()
-text = replace_once(text, '    id: shell', '    id: shell\n    signal hostModeToggleRequested()')
+text = replace_once(text, '    id: shell', '    id: shell\n    signal hostModeToggleRequested()\n'
+                    '    GSettings { id: hostPreferences; schema.id: "com.lomiri.Termux" }')
+text = replace_once(text, '            deferred: shell.mode === "greeter"',
+                    '            deferred: true // Android handles device setup in this private shell.')
 text = replace_once(text,
     'anchors.leftMargin: (launcher.lockedByUser && launcher.lockAllowed) ? launcher.panelWidth : 0',
     'anchors.leftMargin: 0\n        anchors.bottomMargin: hostDock.height')
@@ -106,7 +116,17 @@ text = replace_once(text,
     '            anchors.topMargin: inverted ? 0 : panel.panelHeight\n            anchors.bottom: parent.bottom',
     '            anchors.topMargin: inverted ? 0 : panel.panelHeight\n'
     '            anchors.bottom: parent.bottom\n            anchors.bottomMargin: hostDock.height')
-text = replace_once(text, '        KeyboardShortcutsOverlay {', '''        HostDock {
+text = replace_once(text, '        KeyboardShortcutsOverlay {', '''        GlobalShortcut {
+            shortcut: hostPreferences.drawerShortcut === "F8" ? Qt.Key_F8 : (Qt.ControlModifier | Qt.AltModifier | Qt.Key_D)
+            onTriggered: launcher.toggleDrawer(true)
+        }
+        GlobalShortcut {
+            shortcut: hostPreferences.modeShortcut === "F9" ? Qt.Key_F9 : (Qt.ControlModifier | Qt.AltModifier | Qt.Key_M)
+            onTriggered: {
+                launcher.hide(); stage.closeSpread(); shell.hostModeToggleRequested();
+            }
+        }
+        HostDock {
             id: hostDock
             z: 100
             anchors.left: parent.left
@@ -168,6 +188,26 @@ text = replace_once(text,
     '                            requestedWidth: root.availableDesktopArea.width\n'
     '                            requestedHeight: root.availableDesktopArea.height')
 stage.write_text(text)
+
+workspace = target / 'Stage/WorkspaceSwitcher.qml'
+text = workspace.read_text()
+text = replace_once(text, 'width: screensRepeater.itemAt(d.highlightedScreenIndex).width',
+    'width: screensRepeater.count > d.highlightedScreenIndex && screensRepeater.itemAt(d.highlightedScreenIndex)\n'
+    '                ? screensRepeater.itemAt(d.highlightedScreenIndex).width : 0')
+workspace.write_text(text)
+
+# Lomiri's units.gu() method does not itself expose a reactive dependency.
+# Keep its conversion and explicitly read gridUnit so scale changes relayout.
+for qml in target.rglob('*.qml'):
+    text = qml.read_text()
+    if 'units.gu(' not in text:
+        continue
+    match = re.search(r'(?m)^[A-Za-z_][\w.]*\s*\{', text)
+    if not match:
+        raise RuntimeError(f'Unsupported scalable QML root: {qml.relative_to(target)}')
+    text = text.replace('units.gu(', 'hostGu(')
+    text = text[:match.end()] + '\n    function hostGu(value) { return units.gu(value) + units.gridUnit * 0; }\n' + text[match.end():]
+    qml.write_text(text)
 
 pulse = Path(__import__('os').environ['XDG_CONFIG_HOME']) / 'pulse/client.conf'
 pulse.parent.mkdir(parents=True, exist_ok=True)

@@ -1,12 +1,16 @@
 import QtQuick 2.15
 import Lomiri.Components 1.3
 import Lomiri.Launcher 0.1
+import GSettings 1.0
 
 Rectangle {
     id: dock
     objectName: "hostBottomDock"
-    height: units.gu(7)
-    color: "#202027"
+    height: units.gu(preferences.dockHeight)
+    color: lightMode ? "#f7f7fb" : "#202027"
+    property bool lightMode: shellPreferences.lightMode
+    GSettings { id: preferences; schema.id: "com.lomiri.Termux" }
+    GSettings { id: shellPreferences; schema.id: "com.lomiri.Shell" }
     property bool desktopMode: false
     signal applicationSelected(string appId)
     signal drawerRequested()
@@ -67,10 +71,10 @@ Rectangle {
         delegate: Rectangle {
             width: dock.height
             height: dock.height
-            color: appTouch.pressed ? "#555560" : model.focused ? "#373743" : "transparent"
+            color: appTouch.pressed ? "#777780" : model.focused ? (dock.lightMode ? "#dedee8" : "#373743") : "transparent"
             Icon {
                 anchors.centerIn: parent
-                width: units.gu(4.5)
+                width: dock.height * .64
                 height: width
                 source: model.icon
             }
@@ -82,7 +86,7 @@ Rectangle {
                 height: units.gu(.4)
                 radius: height / 2
                 visible: model.running
-                color: model.focused ? "#ff9955" : "#dddddd"
+                color: model.focused ? "#ee7733" : dock.lightMode ? "#626275" : "#dddddd"
             }
             MouseArea {
                 id: appTouch
@@ -99,13 +103,15 @@ Rectangle {
         width: height
         Rectangle {
             width: units.gu(2.8); height: units.gu(2.5)
-            x: units.gu(2); y: units.gu(1.6)
+            anchors.centerIn: parent
+            anchors.horizontalCenterOffset: units.gu(.4)
+            anchors.verticalCenterOffset: -units.gu(.4)
             color: "transparent"; border.color: "#aaaaaa"; border.width: 2; radius: 3
         }
         Rectangle {
             width: units.gu(2.8); height: units.gu(2.5)
-            x: units.gu(1.3); y: units.gu(2.3)
-            color: "#202027"; border.color: "white"; border.width: 2; radius: 3
+            anchors.centerIn: parent
+            color: dock.color; border.color: dock.lightMode ? "#444455" : "white"; border.width: 2; radius: 3
         }
         MouseArea {
             anchors.fill: parent
@@ -118,11 +124,11 @@ Rectangle {
         anchors.right: parent.right
         height: parent.height
         width: units.gu(9)
-        color: modeTouch.pressed ? "#555560" : "#30303a"
+        color: modeTouch.pressed ? "#777780" : dock.lightMode ? "#e5e5ed" : "#30303a"
         Text {
             anchors.centerIn: parent
             text: dock.desktopMode ? "PC" : "Mobile"
-            color: "white"
+            color: dock.lightMode ? "#242532" : "white"
             font.pixelSize: units.gu(1.8)
         }
         MouseArea {
