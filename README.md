@@ -73,6 +73,14 @@ Broker chỉ nhận tên hai app này và khởi động chúng trong process gr
 
 Để giữ sáng khi rời điện thoại: Preferences của Termux:X11 → **Screen idle timeout → Never (keep screen on)**, rồi để X11 ở phía trước. Rời X11, khóa bằng nút nguồn hoặc đổi lại **System** để điện thoại nghỉ. Luôn sáng tốn pin hơn, nên cắm sạc khi để lâu.
 
+## Bổ sung ngày 30/10/2026
+
+Menu Lomiri đã mở được bộ app cơ bản qua adapter của phiên PRoot. Cài phần bổ sung trên máy mới bằng `bash scripts/install-core-apps.sh`, rồi restart Lomiri. Bộ app gồm Terminal, File Manager, Calculator, Clock, Calendar, Gallery và Media Player; VSCode/Firefox được cài riêng như hướng dẫn ở trên.
+
+Shortcut và menu dùng cùng cơ chế mở app. Khi VSCode đang chạy, chọn icon của nó để chuyển về cửa sổ hiện có. Rotation do Android thực hiện; overlay riêng theo kích thước màn hình và tránh xoay hai lần. VSCode dùng hộp thoại file tích hợp và Python mặc định `/usr/bin/python3` trong guest.
+
+Đã thử tạo/lưu/chạy Python trong VSCode và kết nối audio tới Termux. Tiếng Việt có dấu qua Laban Key còn lỗi; media, báo thức, dịch vụ phần cứng và độ ổn định dài hạn chưa được coi là hoàn thiện. Xem [báo cáo kiểm chứng hiện tại](docs/verification-20261030.md). Các mục dưới bao gồm cả kết quả lịch sử.
+
 ## Trạng thái và giới hạn
 
 - Đã thấy shell, launcher/drawer, app Qt/Wayland và nhập chữ trong phiên bình thường, không tải QML chẩn đoán.

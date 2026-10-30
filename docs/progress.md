@@ -68,3 +68,8 @@ Mã upstream đã đọc chỉ để đối chiếu; chưa sửa hay build lại
 - Một số phím/chạm tiêm quá nhanh bị mất; dùng nhịp chậm hơn hoàn tất thử nghiệm. Alt+Tab và nút maximize của Lomiri hoạt động cho các cửa sổ đã thử.
 - ChatGPT web chạy trong Firefox Wayland, gửi 2+2 và nhận 2 + 2 = 4 khi chưa đăng nhập; không kiểm tra phiên tài khoản hay nhập tiếng Việt có dấu.
 - Theo yêu cầu giữ phone không khóa khi đi lâu, đặt Screen idle timeout của Termux:X11 thành Never (keep screen on), đã đọc lại giá trị. Cần để X11 ở phía trước; vẫn khóa bằng nút nguồn được. Không đo pin/GPU.
+
+
+## 2026-10-30 — menu ứng dụng, rotation và VSCode
+
+Đã sửa và kiểm tra menu/shortcut, rotation kép, Save As, interpreter Python và kết nối audio trong phiên PRoot riêng. Xem [báo cáo kiểm chứng](verification-20261030.md) để biết bằng chứng, phạm vi test và các lỗi còn lại.

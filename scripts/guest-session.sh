@@ -6,6 +6,8 @@ export XDG_RUNTIME_DIR="$project/runtime/xdg"
 export XDG_CONFIG_HOME="$project/runtime/config"
 export XDG_CACHE_HOME="$project/runtime/cache"
 export XDG_DATA_HOME="$project/runtime/data"
+export LOMIRI_APP_LAUNCH_SYSTEMD_CGROUP_ROOT="$project/runtime/app-pids"
+mkdir -p "$LOMIRI_APP_LAUNCH_SYSTEMD_CGROUP_ROOT"
 mkdir -p "$XDG_RUNTIME_DIR" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME"
 chmod 700 "$XDG_RUNTIME_DIR"
 export XDG_CURRENT_DESKTOP=Lomiri
