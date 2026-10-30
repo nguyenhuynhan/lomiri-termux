@@ -8,7 +8,7 @@ Window {
     width: 480
     height: 760
     visible: true
-    title: "Settings"
+    title: "Session Settings"
     color: light ? "#f4f4f8" : "#181922"
     property bool light: shellSettings.lightMode
     property color ink: light ? "#242532" : "#f5f5fa"
@@ -62,6 +62,7 @@ Window {
         shellSettings.schema.reset("background-picture-uri");
         hostSettings.schema.reset("ui-scale");
         hostSettings.schema.reset("dock-height");
+        shellSettings.schema.reset("launcher-width");
         hostSettings.schema.reset("drawer-shortcut");
         hostSettings.schema.reset("mode-shortcut");
         candidateWallpaper = "";
@@ -146,8 +147,8 @@ Window {
                     model: [{label: "Gọn", value: 6}, {label: "Vừa", value: 7}, {label: "Lớn", value: 9}]
                     SettingsChoice {
                         width: (content.width - app.gu(2)) / 3
-                        text: modelData.label; light: app.light; selected: hostSettings.dockHeight === modelData.value
-                        onClicked: hostSettings.dockHeight = modelData.value
+                        text: modelData.label; light: app.light; selected: shellSettings.launcherWidth === modelData.value
+                        onClicked: shellSettings.launcherWidth = modelData.value
                     }
                 }
             }

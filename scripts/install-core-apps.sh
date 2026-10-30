@@ -4,7 +4,7 @@ guest_root /usr/bin/env DEBIAN_FRONTEND=noninteractive /bin/bash -c '
 set -e
 apt-get update
 apt-get install -y --no-install-recommends python3-dbus python3-gi \
-  qmlscene qml-module-qt-labs-folderlistmodel \
+  qmlscene qml-module-qt-labs-folderlistmodel lomiri-system-settings \
   lomiri-app-launch-tools lomiri-content-hub pulseaudio-utils libqt5multimedia5-plugins \
   lomiri-terminal-app lomiri-filemanager-app lomiri-calculator-app lomiri-clock-app \
   lomiri-calendar-app lomiri-gallery-app lomiri-mediaplayer-app

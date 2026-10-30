@@ -29,7 +29,7 @@ ALLOWED = {
     'lomiri-terminal-app', 'lomiri-filemanager-app', 'lomiri-calculator-app',
     'lomiri-clock-app', 'lomiri-calendar-app', 'lomiri-gallery-app',
     'lomiri-mediaplayer-app', 'firefox-esr', 'com.microsoft.VSCode',
-    'lomiri-code', 'lomiri-chatgpt', 'lomiri-session-settings',
+    'lomiri-code', 'lomiri-chatgpt', 'lomiri-session-settings', 'lomiri-system-settings',
 }
 
 
@@ -176,6 +176,19 @@ class AppServices(dbus.service.Object):
         home = RUNTIME / 'app-home'
         home.mkdir(mode=0o700, exist_ok=True)
         env['HOME'] = str(home)
+        launch_binary = str(binary)
+        if app == 'lomiri-system-settings':
+            env['XDG_DATA_DIRS'] = '/usr/local/share:/usr/share:' + str(RUNTIME / 'native-data')
+            build_record = RUNTIME / 'native-build/build.json'
+            frontend = RUNTIME / 'native-build/build/lomiri-system-settings'
+            if build_record.exists():
+                record = json.loads(build_record.read_text())
+                if (record.get('source_version') != '1.3.1'
+                        or hashlib.sha256(frontend.read_bytes()).hexdigest() != record.get('binary_sha256')
+                        or hashlib.sha256(Path('/usr/bin/lomiri-system-settings').read_bytes()).hexdigest()
+                           != record.get('packaged_binary_sha256')):
+                    raise Rejected('Native Settings frontend build verification failed')
+                launch_binary = str(frontend)
         if app in ('com.microsoft.VSCode', 'lomiri-code'):
             args = [str(binary), '--ozone-platform=wayland', '--disable-gpu', '--disable-dev-shm-usage',
                     f'--user-data-dir={RUNTIME / "vscode/user-data"}',
@@ -185,7 +198,7 @@ class AppServices(dbus.service.Object):
         elif app in ('firefox-esr', 'lomiri-chatgpt'):
             args = [str(binary), '--no-remote', '--profile', str(RUNTIME / 'firefox-chatgpt'), 'https://chatgpt.com/']
         with (RUNTIME / f'app-{app}.log').open('a') as log:
-            process = subprocess.Popen(args, executable=str(binary), env=env, cwd=home,
+            process = subprocess.Popen(args, executable=launch_binary, env=env, cwd=home,
                                        stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT)
         unit = AppUnit(self, str(name), process, env)
         self.units[str(name)] = unit

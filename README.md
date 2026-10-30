@@ -89,7 +89,7 @@ Nút **Mobile / PC** ở mép phải dock hiển thị chế độ hiện tại;
 
 ## Cài đặt phiên Lomiri
 
-Ứng dụng **Settings / Cài đặt** tùy chỉnh Mobile/PC, giao diện sáng/tối, cỡ shell,
+Ứng dụng **Session Settings / Cài đặt phiên Lomiri** tùy chỉnh Mobile/PC, giao diện sáng/tối, cỡ shell,
 hiệu ứng làm mờ, kích thước dock, app ghim, hình nền và phím tắt. Cấu hình lưu
 trong `runtime/config` của dự án. Cỡ shell không thay cỡ chữ VSCode/Firefox.
 F8 mở danh sách app, F9 đổi Mobile/PC; có thể chuyển sang Ctrl+Alt+D/M trong app.
@@ -101,6 +101,12 @@ Settings được thêm vào dock một lần, giữ các app ghim hiện có. T
 quyền ứng dụng chỉnh trong Cài đặt Android.
 
 Xem kiểm chứng và các phần còn chờ thử ở [báo cáo Settings](docs/settings-20261030.md).
+
+**System Settings** là ứng dụng gốc Lomiri, có icon riêng trong menu và dock.
+Đã khôi phục launcher, nối hình nền và kích thước dock với cấu hình phiên, cùng
+bản vá null khi đổi theme. Để dựng frontend gốc có bản vá trên máy mới, chạy
+`bash scripts/build-native-settings.sh` rồi restart Lomiri. Các dịch vụ phần cứng
+Android chưa được nối đủ; xem [báo cáo app gốc](docs/native-settings-20261030.md).
 
 ## Trạng thái và giới hạn
 

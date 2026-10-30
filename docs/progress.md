@@ -1,5 +1,22 @@
 # Nhật ký kiểm chứng
 
+## Native System Settings — 2026-10-30
+
+- Giữ Settings tự viết ở commit `69bb7ce`; đổi tên trong phiên thành
+  Session Settings. Phần khôi phục native ở branch `codex/native-system-settings`.
+- Khôi phục desktop entry package `lomiri-system-settings 1.3.1-6`, whitelist
+  adapter, icon menu/dock và plugin overlay riêng. Nối hình nền với private
+  GSettings, dùng launcher-width cho dock; khởi chạy Ayatana sound service thật.
+- Build frontend gốc 1.3.1 từ archive đã đối chiếu SHA256 với Debian dsc, áp dụng
+  null guards searchField giống upstream; không ghi đè binary package. Kiểm tra
+  memory maps xác nhận app dùng bản build riêng.
+- Máy thật: Preview/Set hình nền, persistence restart, theme/blur, slider dock,
+  app theme hai chiều; native launch/single-instance/owned stop/reopen đều qua.
+  Xvfb shell probe và syntax checks qua. Menu hiện hai app riêng.
+- Có lỗi redraw sau một vòng rotation; cold portrait restart khôi phục đầy đủ.
+  Các dịch vụ Android/system bus và cảnh báo native chưa được coi là đã sửa hết.
+  Xem [báo cáo native Settings](native-settings-20261030.md) cho phạm vi và recovery.
+
 ## Settings — 2026-10-30
 
 - Thêm Settings riêng cho phiên PRoot, schema private, desktop entry và giới hạn

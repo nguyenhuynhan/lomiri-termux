@@ -23,7 +23,7 @@ def prepare():
     script = str(ROOT / 'scripts/guest-settings.py')
     quoted = script.replace('\\', '\\\\').replace('"', '\\"').replace('`', '\\`').replace('$', '\\$')
     (apps / 'lomiri-session-settings.desktop').write_text(
-        '[Desktop Entry]\nType=Application\nName=Settings\nName[vi]=Cài đặt\n'
+        '[Desktop Entry]\nType=Application\nName=Session Settings\nName[vi]=Cài đặt phiên Lomiri\n'
         'Comment=Customize the Lomiri session\n'
         f'Icon={ROOT / "apps/settings.svg"}\n'
         f'Exec=/usr/bin/python3 "{quoted}"\n'

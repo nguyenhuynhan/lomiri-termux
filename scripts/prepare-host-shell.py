@@ -229,7 +229,7 @@ for name, title, binary, icon in [
         f'[Desktop Entry]\nType=Application\nName={title}\nExec={binary}\nIcon={icon}\n'
         'Terminal=false\nX-Lomiri-Touch=true\nX-Lomiri-Single-Instance=true\n')
 for name in ('com.microsoft.VSCode', 'com.microsoft.VSCode.UrlHandler', 'firefox-esr',
-             'miral-shell', 'lomiri-probe', 'lomiri-system-settings'):
+             'miral-shell', 'lomiri-probe'):
     (applications / f'{name}.desktop').write_text(
         '[Desktop Entry]\nType=Application\nName=Unavailable in PRoot\nHidden=true\n')
 

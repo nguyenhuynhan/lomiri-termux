@@ -20,6 +20,12 @@ for ((n=0;n<40;n++)); do
   sleep 0.1
 done
 [[ -f "$project/runtime/app-services.ready" ]] || { echo 'App services did not become ready'; exit 2; }
+sound_pid=''
+sound_service=/usr/libexec/ayatana-indicator-sound/ayatana-indicator-sound-service
+if [[ -x "$sound_service" ]]; then
+  "$sound_service" > "$project/runtime/indicator-sound.log" 2>&1 &
+  sound_pid=$!
+fi
 if [[ "${LOMIRI_TRACE:-0}" == 1 ]]; then
   export LD_PRELOAD="$project/runtime/libcrash-trace.so"
 fi
@@ -50,6 +56,28 @@ if uri not in items:
 PY
     touch "$project/runtime/settings-launcher-v1"
   fi
+  if [[ ! -f "$project/runtime/native-settings-launcher-v1" && -x /usr/bin/lomiri-system-settings ]]; then
+    python3 - <<'PY'
+from gi.repository import Gio
+settings = Gio.Settings.new('com.lomiri.Shell.Launcher')
+items = settings.get_strv('items')
+uri = 'application:///lomiri-system-settings.desktop'
+if uri not in items:
+    settings.set_strv('items', items + [uri])
+    Gio.Settings.sync()
+PY
+    touch "$project/runtime/native-settings-launcher-v1"
+  fi
+  if [[ ! -f "$project/runtime/native-dock-width-v1" ]]; then
+    python3 - <<'PY'
+from gi.repository import Gio
+settings = Gio.Settings.new('com.lomiri.Shell')
+preferences = Gio.Settings.new('com.lomiri.Termux')
+settings.set_uint('launcher-width', preferences.get_uint('dock-height'))
+Gio.Settings.sync()
+PY
+    touch "$project/runtime/native-dock-width-v1"
+  fi
   args+=("--qmlfile=$project/runtime/host-qml/ShellApplication.qml")
 fi
 if [[ "${LOMIRI_DIRECT:-0}" != 1 ]]; then args+=(--windowgeometry=480x800); fi
@@ -58,7 +86,7 @@ if [[ "${LOMIRI_DIRECT:-0}" != 1 && "${LOMIRI_INPUT_TRACE:-0}" == 1 && -f "$proj
 fi
 lomiri "${args[@]}" &
 shell_pid=$!
-trap 'kill -TERM "$shell_pid" "$services_pid" 2>/dev/null || true' EXIT
+trap 'kill -TERM "$shell_pid" "$services_pid" ${sound_pid:+"$sound_pid"} 2>/dev/null || true' EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
 wait "$shell_pid"

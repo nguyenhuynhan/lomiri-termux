@@ -6,7 +6,7 @@ import GSettings 1.0
 Rectangle {
     id: dock
     objectName: "hostBottomDock"
-    height: units.gu(preferences.dockHeight)
+    height: units.gu(shellPreferences.launcherWidth)
     color: lightMode ? "#f7f7fb" : "#202027"
     property bool lightMode: shellPreferences.lightMode
     GSettings { id: preferences; schema.id: "com.lomiri.Termux" }

@@ -11,6 +11,7 @@ mkdir -p "$LOMIRI_APP_LAUNCH_SYSTEMD_CGROUP_ROOT"
 mkdir -p "$XDG_RUNTIME_DIR" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME"
 chmod 700 "$XDG_RUNTIME_DIR"
 python3 "$project/scripts/prepare-settings.py"
+python3 "$project/scripts/prepare-native-settings.py"
 export GSETTINGS_SCHEMA_DIR="$XDG_DATA_HOME/glib-2.0/schemas"
 export XDG_CURRENT_DESKTOP=Lomiri
 export QT_QPA_PLATFORM=mirserver
