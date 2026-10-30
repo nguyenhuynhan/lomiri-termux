@@ -79,6 +79,12 @@ Menu Lomiri đã mở được bộ app cơ bản qua adapter của phiên PRoot
 
 Shortcut và menu dùng cùng cơ chế mở app. Khi VSCode đang chạy, chọn icon của nó để chuyển về cửa sổ hiện có. Rotation do Android thực hiện; overlay riêng theo kích thước màn hình và tránh xoay hai lần. VSCode dùng hộp thoại file tích hợp và Python mặc định `/usr/bin/python3` trong guest.
 
+Ở phiên direct, dock luôn hiện ngang ở cạnh dưới, kể cả khi app toàn màn hình. Chạm nút chín chấm bên trái để mở danh sách ứng dụng; chạm icon để mở/chuyển app. Dấu bên dưới icon cho biết app đang chạy, màu cam là app được chọn. Dock bám theo cạnh dưới khi xoay máy; nếu nhiều icon, vuốt ngang trên hàng icon. Vùng app được thu ngắn để không bị dock che.
+
+Nút **Mobile / PC** ở mép phải dock hiển thị chế độ hiện tại; chạm để đổi ngay, giữ các app đang chạy. Lựa chọn được lưu trong cấu hình riêng của phiên và giữ nguyên khi xoay máy. Mobile dùng app phủ vùng làm việc; PC có cửa sổ, thanh tiêu đề và nút **đóng / thu nhỏ / phóng to hoặc khôi phục**. Khi app phóng to hoặc F11 trong PC, các nút nằm ở góc trên bên trái.
+
+Để đóng app ở Mobile: chạm biểu tượng **hai cửa sổ chồng nhau** cạnh nút Mobile/PC để mở đa nhiệm, tìm thẻ app rồi **vuốt thẻ lên trên**. Có thể vuốt ngang để tìm app khác; chạm thẻ để quay lại app. Đổi sang app khác bằng dock chỉ chuyển cửa sổ, không đóng app cũ. App có thể hỏi lưu nội dung trước khi đóng.
+
 Đã thử tạo/lưu/chạy Python trong VSCode và kết nối audio tới Termux. Tiếng Việt có dấu qua Laban Key còn lỗi; media, báo thức, dịch vụ phần cứng và độ ổn định dài hạn chưa được coi là hoàn thiện. Xem [báo cáo kiểm chứng hiện tại](docs/verification-20261030.md). Các mục dưới bao gồm cả kết quả lịch sử.
 
 ## Trạng thái và giới hạn

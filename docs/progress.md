@@ -73,3 +73,23 @@ Mã upstream đã đọc chỉ để đối chiếu; chưa sửa hay build lại
 ## 2026-10-30 — menu ứng dụng, rotation và VSCode
 
 Đã sửa và kiểm tra menu/shortcut, rotation kép, Save As, interpreter Python và kết nối audio trong phiên PRoot riêng. Xem [báo cáo kiểm chứng](verification-20261030.md) để biết bằng chứng, phạm vi test và các lỗi còn lại.
+
+## 2026-10-30 — dock cố định ở cạnh dưới
+
+- Theo yêu cầu, phiên direct dùng `src/HostDock.qml`: hàng icon ngang luôn hiện, nút chín chấm mở drawer có sẵn, dùng cùng LauncherModel và đường activateApplication của Lomiri. Dải launcher dọc và vùng kéo từ cạnh trái được tắt trong overlay riêng.
+- Thu ngắn Stage và available desktop area một khoảng bằng chiều cao dock (7 grid units); app toàn màn hình vẫn nằm phía trên dock. Chiều rộng/vị trí dock bind theo viewport, không xoay dock độc lập.
+- Máy thật vẫn dùng Lomiri 0.5.0-2, Android 17, Termux:X11 1.03.01-8ebcf1e-21.10.26 và software rendering. Đã chạm dock để mở VSCode, mở drawer, mở Calculator và chuyển về VSCode hiện có; không tạo tiến trình Code thứ hai.
+- Ảnh màn hình xác nhận dock ở dưới trong cả bốn hướng Android (0/90/180/270 độ), bao gồm VSCode F11 toàn màn hình. Đã trả Android về tự xoay sau kiểm tra. Nội dung VSCode chưa lưu được khôi phục sau restart; có backup workspace/Backups trong runtime.
+- Bash syntax, 3 lifecycle tests, Qt input bridge thực và viewport Xvfb test đều qua. Probe app-services từ chối chạy vì Calculator thử đang mở, đúng điều kiện bảo vệ của test; không tính lần này là probe app-services đã qua. Không thấy lỗi QML liên quan HostDock; cảnh báo WorkspaceSwitcher `width of null` có sẵn lúc khởi động vẫn còn.
+- Chưa thử hàng icon tràn khi mở rất nhiều app hoặc bàn phím Android với dock. Log và ảnh kiểm tra giữ ngoài Git.
+
+## 2026-10-30 — chọn Mobile/PC và đóng ứng dụng
+
+- Thêm nút Mobile/PC và nút đa nhiệm (hai cửa sổ chồng nhau) vào bên phải dock. Mode dùng GSettings `com.lomiri.Shell usage-mode` trong XDG config riêng: Staged cho mobile, Windowed cho PC; không đổi desktop bên ngoài project. Chuyển trực tiếp qua cơ chế convergence của Lomiri, không restart app.
+- Chặn tự chọn usage-mode theo chuột/kích thước trong overlay OrientedShell: đã tái hiện PC tự trở về Staged khi xoay vì PRoot không có pointer devices. Sau sửa, xoay ngang/dọc vẫn đọc lại Windowed và dock vẫn hiện PC.
+- PC dùng decoration native, chiều cao 5.5 GU cho thao tác chạm. Các nút đóng/thu nhỏ/khôi phục trên panel không cần hover; cửa sổ F11 vẫn có dải điều khiển. Mobile giữ phone/tablet theo viewport và panel gọn 3 GU.
+- Trên máy thật đã chạm nút PC/Mobile và đọc lại GSettings từ tiến trình khác; đã phóng to Calculator, thu nhỏ (app vẫn chạy), chọn dock để hiện lại, rồi đóng bằng nút X (ListUnits không còn Calculator). VSCode đang có nội dung chưa lưu vẫn được giữ qua đổi mode.
+- Nút đa nhiệm gọi spread có sẵn. Trong Mobile đã mở Calculator, mở đa nhiệm và vuốt thẻ Calculator lên: số unit Calculator từ 1 về 0, log exit status 0; Code tiếp tục chạy. Không coi việc chỉ đổi focus là đóng app.
+- Bash syntax, Python parse, 3 lifecycle tests, real Qt input bridge đều qua. Live app-services probe đã chạy lại thành công trong phiên kiểm tra này (launch/PID/ownership/stop). Ảnh kiểm tra PC F11 ngang có nút điều khiển và dock; phần nội dung vẫn còn khoảng nền phía dưới trong lần đó. Có một ảnh đa nhiệm ngay sau xoay/đổi mode bị redraw đen một phần; chưa coi render/transition dưới llvmpipe là hoàn thiện.
+- Đã trả mode Staged/Mobile, tự xoay Android và focus VSCode cuối phiên.
+- Kiểm tra tiếp xác nhận vùng đen phía dưới còn tồn tại sau đổi mode/xoay, không chỉ là ảnh chụp giữa transition. Bổ sung binding width/height tường minh cho OrientedShell trong ShellScreen (trước đó chỉ có implicitWidth/implicitHeight). Sau restart đã thử lại PC -> ngang -> dọc -> Mobile, rồi lặp lại với F11 và đa nhiệm: shell/dock phủ hết viewport, không còn vùng đen phía dưới trong các lần thử cuối. Giữ ghi nhận khoảng nền PC F11 ở trên là giới hạn riêng chưa tối ưu.
