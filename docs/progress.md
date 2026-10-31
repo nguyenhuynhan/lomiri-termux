@@ -212,3 +212,36 @@ Mã upstream đã đọc chỉ để đối chiếu; chưa sửa hay build lại
 - Bash syntax, Python parse, 3 lifecycle tests, real Qt input bridge đều qua. Live app-services probe đã chạy lại thành công trong phiên kiểm tra này (launch/PID/ownership/stop). Ảnh kiểm tra PC F11 ngang có nút điều khiển và dock; phần nội dung vẫn còn khoảng nền phía dưới trong lần đó. Có một ảnh đa nhiệm ngay sau xoay/đổi mode bị redraw đen một phần; chưa coi render/transition dưới llvmpipe là hoàn thiện.
 - Đã trả mode Staged/Mobile, tự xoay Android và focus VSCode cuối phiên.
 - Kiểm tra tiếp xác nhận vùng đen phía dưới còn tồn tại sau đổi mode/xoay, không chỉ là ảnh chụp giữa transition. Bổ sung binding width/height tường minh cho OrientedShell trong ShellScreen (trước đó chỉ có implicitWidth/implicitHeight). Sau restart đã thử lại PC -> ngang -> dọc -> Mobile, rồi lặp lại với F11 và đa nhiệm: shell/dock phủ hết viewport, không còn vùng đen phía dưới trong các lần thử cuối. Giữ ghi nhận khoảng nền PC F11 ở trên là giới hạn riêng chưa tối ưu.
+
+## 2026-10-31 — tự mở bàn phím và sửa Backspace tiếng Việt
+
+- Người dùng báo chạm chưa mở bàn phím, gõ Việt còn lỗi và Backspace không hoạt
+  động. Laban ở English làm rơi ba trong bốn lần Backspace trong Qt qua X11.
+  Đổi IME Android sang Unexpected Keyboard 2.1.0 English, giữ Laban để chọn lại.
+  Dùng Fcitx5/UniKey Telex trong profile/bus riêng của Debian Lomiri.
+- Addon quan sát focus/capability, host xác thực metadata và owner rồi gửi
+  toggle có tag tới Termux:X11. Theo dõi XI_RawButtonPress trên display riêng
+  để chạm lại ô Electron đang focus sau Back mở lại bàn phím; không đọc raw keys.
+  Dock VN/EN và Session Settings đổi bộ gõ, tùy chọn tự mở được lưu riêng.
+- Mir 2.20.2-2 có serial client chưa khởi tạo trong keyboard grab và bắt lại
+  phím từ virtual keyboard của Fcitx. Hai patch sửa serial và bỏ qua virtual
+  keyboard của chính grab client. Chỉ build mirserver, nạp library riêng vào
+  shell với guard ABI/version/hash; không thay library hệ thống.
+- Qt, Terminal, VSCode, ChatGPT Desktop và Firefox đã qua mẫu Telex và xóa liên
+  tiếp. Sau cấu hình cuối, VSCode tạo Untitled bằng Ctrl+N, gõ
+  `tieengs vieetj xin chaof ` thành `tiếng việt xin chào `, Backspace 5 lần còn
+  `tiếng việt xin `; Back rồi chạm lại mở bàn phím. Đã xóa/đóng riêng Untitled thử.
+- Cầu nối key cho shell thử ghép dấu được nhưng Backspace/phím tắt lỗi, chế độ
+  đồng bộ gây SIGSEGV. Đã gỡ code thử, trả shell về QT_IM_MODULE=compose;
+  drawer/search chỉ English và có thể cần mở bàn phím thủ công. Không dùng
+  kết quả bản thử làm bằng chứng shell đã hỗ trợ tiếng Việt.
+- Phép thử phím tắt từng nhập thêm câu mẫu vào dòng 2 buffer VSCode chưa lưu.
+  Đã xóa đúng phần thử và xác nhận dòng `print("LOMIRI_SMOKE_20261030")`, dòng 2
+  trống và trạng thái chưa lưu được giữ. Backup workspace/profile ở runtime.
+- Tám keyboard policy tests, Bash/Python syntax, real Qt mouse probe và các
+  guard Mir/input đều qua. Phiên cuối nạp compose được đọc lại từ process.
+  Xoay với bàn phím mở còn hạn chế redraw; đã trả tự xoay Android về cấu hình cũ.
+  Người dùng đã thử trực tiếp trong Thử bàn phím và xác nhận “Cả ba đều đúng”:
+  tự hiện bàn phím, mẫu Telex đúng dấu và Backspace năm lần xóa đúng.
+  CI hosted chưa chạy tại thời điểm kiểm chứng trên thiết bị. Chi tiết trong
+  [báo cáo bàn phím](keyboard-20261031.md).

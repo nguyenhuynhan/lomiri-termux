@@ -5,6 +5,7 @@ child_pid=''
 server_pid=''
 launcher_pid=''
 sync_pid=''
+keyboard_pid=''
 audio_module=''
 audio_port=''
 cleanup() {
@@ -12,6 +13,7 @@ cleanup() {
   if [[ -n "$server_pid" ]]; then kill -TERM "$server_pid" 2>/dev/null || true; fi
   if [[ -n "$launcher_pid" ]]; then kill -TERM "$launcher_pid" 2>/dev/null || true; fi
   if [[ -n "$sync_pid" ]]; then kill -TERM "$sync_pid" 2>/dev/null || true; fi
+  if [[ -n "$keyboard_pid" ]]; then kill -TERM "$keyboard_pid" 2>/dev/null || true; fi
   if [[ -n "$audio_module" ]]; then
     module_line=$(pactl list short modules 2>/dev/null | awk -v id="$audio_module" '$1 == id') || true
     if [[ "$module_line" == *module-native-protocol-tcp* && "$module_line" == *"port=$audio_port "* ]]; then
@@ -40,6 +42,10 @@ if [[ "${LOMIRI_DIRECT:-0}" == 1 ]]; then
   [[ -n "$LOMIRI_X11_OUTPUT" ]] || { echo 'Direct X11 server is not ready.' >&2; exit 2; }
   python "$PROJECT_ROOT/scripts/display-sync.py" "$LOMIRI_DISPLAY" > "$PROJECT_ROOT/runtime/display-sync.log" 2>&1 &
   sync_pid=$!
+  if [[ -f "$PROJECT_ROOT/runtime/keyboard-enabled" ]]; then
+    python "$PROJECT_ROOT/scripts/keyboard-host.py" "$LOMIRI_DISPLAY" > "$PROJECT_ROOT/runtime/keyboard-host.log" 2>&1 &
+    keyboard_pid=$!
+  fi
 fi
 # PRoot's emulated UID breaks Unix credentials. Use cookie-authenticated loopback
 # and unload only this session's module; never stop the shared Termux daemon.

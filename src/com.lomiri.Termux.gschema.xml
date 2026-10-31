@@ -17,5 +17,13 @@
       <default>'F9'</default><choices><choice value="F9"/><choice value="Ctrl+Alt+M"/></choices>
       <summary>Shortcut to switch Mobile and PC</summary>
     </key>
+    <key name="vietnamese-input" type="b">
+      <default>true</default>
+      <summary>Use UniKey for Vietnamese input in this session</summary>
+    </key>
+    <key name="auto-keyboard" type="b">
+      <default>true</default>
+      <summary>Show the Android keyboard when a Linux text input gains focus</summary>
+    </key>
   </schema>
 </schemalist>

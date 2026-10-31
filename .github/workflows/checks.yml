@@ -18,6 +18,7 @@ jobs:
           mkdir -p runtime
           for script in scripts/*.sh; do bash -n "$script"; done
           python3 tests/session-lifecycle.py
+          python3 tests/keyboard-policy.py
       - name: Owned display viewport changes
         run: python3 tests/display-sync.py
       - name: Real Qt mouse delivery

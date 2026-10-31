@@ -195,6 +195,23 @@ Window {
                 onClicked: { shellSettings.backgroundPictureUri = app.candidateWallpaper; app.candidateWallpaper = ""; }
             }
 
+            Text { text: "Bàn phím"; color: app.ink; font.bold: true; font.pixelSize: app.gu(2.4) }
+            SettingsChoice {
+                width: parent.width; light: app.light
+                text: "Bộ gõ: " + (hostSettings.vietnameseInput ? "Tiếng Việt (Telex)" : "Tiếng Anh")
+                onClicked: hostSettings.vietnameseInput = !hostSettings.vietnameseInput
+            }
+            SettingsChoice {
+                width: parent.width; light: app.light
+                text: "Tự hiện bàn phím: " + (hostSettings.autoKeyboard ? "Bật" : "Tắt")
+                onClicked: hostSettings.autoKeyboard = !hostSettings.autoKeyboard
+            }
+            Text {
+                width: parent.width
+                text: "Chọn English trên bàn phím Android. Nút VN/EN trên dock đổi bộ gõ trong Lomiri."
+                wrapMode: Text.WordWrap; color: app.muted; font.pixelSize: app.gu(1.8)
+            }
+
             Text { text: "Phím tắt"; color: app.ink; font.bold: true; font.pixelSize: app.gu(2.4) }
             SettingsChoice {
                 width: parent.width; light: app.light; text: "Danh sách app: " + hostSettings.drawerShortcut

@@ -1,10 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 project=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
+keyboard_pid=''
+keyboard_mir=''
+rm -f "$project/runtime/keyboard.ready"
+if [[ -f "$project/runtime/keyboard-enabled" && -x /usr/bin/fcitx5 ]] \
+    && python3 "$project/scripts/check-mir-keyboard.py"; then
+  keyboard_mir="$project/runtime/mir-keyboard/lib/libmirserver.so.63"
+  python3 "$project/scripts/prepare-keyboard.py"
+  python3 "$project/scripts/guest-keyboard.py" > "$project/runtime/keyboard-agent.log" 2>&1 &
+  keyboard_pid=$!
+  for ((n=0;n<100;n++)); do
+    [[ -f "$project/runtime/keyboard.ready" ]] && break
+    kill -0 "$keyboard_pid" 2>/dev/null || break
+    sleep 0.1
+  done
+  if [[ -f "$project/runtime/keyboard.ready" ]]; then
+    export QT_IM_MODULE=fcitx GTK_IM_MODULE=fcitx
+  else
+    echo 'Keyboard startup failed; manual Android input remains available. Inspect keyboard-agent.log.' >&2
+  fi
+fi
 python3 - "$project/runtime/guest-session-env.json" <<'PY'
 import json, os, sys
 from pathlib import Path
-keys = ['DBUS_SESSION_BUS_ADDRESS', 'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME', 'GSETTINGS_SCHEMA_DIR', 'DISPLAY', 'PULSE_SERVER', 'PULSE_COOKIE']
+keys = ['DBUS_SESSION_BUS_ADDRESS', 'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME', 'XDG_DATA_HOME', 'GSETTINGS_SCHEMA_DIR', 'DISPLAY', 'PULSE_SERVER', 'PULSE_COOKIE', 'QT_IM_MODULE', 'GTK_IM_MODULE']
 p = Path(sys.argv[1])
 p.write_text(json.dumps({k: os.environ[k] for k in keys if k in os.environ}))
 p.chmod(0o600)
@@ -13,7 +33,7 @@ export LOMIRI_CODE_NO_SANDBOX="${LOMIRI_CODE_NO_SANDBOX:-0}"
 rm -f "$project/runtime/app-services.ready"
 python3 "$project/scripts/guest-app-services.py" > "$project/runtime/app-services.log" 2>&1 &
 services_pid=$!
-trap 'kill -TERM "$services_pid" 2>/dev/null || true' EXIT
+trap 'kill -TERM "$services_pid" ${keyboard_pid:+"$keyboard_pid"} 2>/dev/null || true' EXIT
 for ((n=0;n<40;n++)); do
   [[ -f "$project/runtime/app-services.ready" ]] && break
   kill -0 "$services_pid" || { cat "$project/runtime/app-services.log"; exit 2; }
@@ -84,9 +104,12 @@ if [[ "${LOMIRI_DIRECT:-0}" != 1 ]]; then args+=(--windowgeometry=480x800); fi
 if [[ "${LOMIRI_DIRECT:-0}" != 1 && "${LOMIRI_INPUT_TRACE:-0}" == 1 && -f "$project/runtime/lomiri-qml/ShellApplication.qml" ]]; then
   args+=("--qmlfile=$project/runtime/lomiri-qml/ShellApplication.qml")
 fi
-lomiri "${args[@]}" &
+if [[ -n "$keyboard_mir" ]]; then
+  export LD_PRELOAD="$keyboard_mir${LD_PRELOAD:+:$LD_PRELOAD}"
+fi
+QT_IM_MODULE=compose lomiri "${args[@]}" &
 shell_pid=$!
-trap 'kill -TERM "$shell_pid" "$services_pid" ${sound_pid:+"$sound_pid"} 2>/dev/null || true' EXIT
+trap 'kill -TERM "$shell_pid" "$services_pid" ${sound_pid:+"$sound_pid"} ${keyboard_pid:+"$keyboard_pid"} 2>/dev/null || true' EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
 wait "$shell_pid"

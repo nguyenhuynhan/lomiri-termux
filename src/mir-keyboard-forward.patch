@@ -1,0 +1,120 @@
+--- a/src/server/frontend_wayland/input_method_grab_keyboard_v2.cpp
++++ b/src/server/frontend_wayland/input_method_grab_keyboard_v2.cpp
+@@ -16,6 +16,7 @@
+ 
+ #include "input_method_grab_keyboard_v2.h"
+ #include "wl_seat.h"
++#include "virtual_keyboard_v1.h"
+ 
+ #include "mir/input/composite_event_filter.h"
+ #include "mir/input/event_filter.h"
+@@ -35,7 +36,8 @@
+ public:
+     Handler(InputMethodGrabKeyboardV2* keyboard, std::shared_ptr<Executor> const& wayland_executor)
+         : keyboard{keyboard},
+-          wayland_executor{wayland_executor}
++          wayland_executor{wayland_executor},
++          client{keyboard->client}
+     {
+     }
+ 
+@@ -45,6 +47,10 @@
+         if (mir_event_get_type(&event) == mir_event_type_input)
+         {
+             auto const input_ev = mir_event_get_input_event(&event);
++            if (virtual_keyboard_owned_by(client, mir_input_event_get_device_id(input_ev)))
++            {
++                return false;
++            }
+             auto const ev_type = mir_input_event_get_type(input_ev);
+             if (ev_type == mir_input_event_type_key || ev_type == mir_input_event_type_keyboard_resync)
+             {
+@@ -65,6 +71,7 @@
+ private:
+     wayland::Weak<InputMethodGrabKeyboardV2> const keyboard;
+     std::shared_ptr<Executor> const wayland_executor;
++    wayland::Client const* const client;
+ };
+ 
+ mf::InputMethodGrabKeyboardV2::InputMethodGrabKeyboardV2(
+--- a/src/server/frontend_wayland/virtual_keyboard_v1.h
++++ b/src/server/frontend_wayland/virtual_keyboard_v1.h
+@@ -20,15 +20,22 @@
+ #include "virtual-keyboard-unstable-v1_wrapper.h"
+ 
+ #include <memory>
++#include "mir_toolkit/event.h"
+ 
+ namespace mir
+ {
++namespace wayland
++{
++class Client;
++}
+ namespace input
+ {
+ class InputDeviceRegistry;
+ }
+ namespace frontend
+ {
++bool virtual_keyboard_owned_by(wayland::Client const* client, MirInputDeviceId device_id);
++
+ auto create_virtual_keyboard_manager_v1(
+     wl_display* display,
+     std::shared_ptr<input::InputDeviceRegistry> const& device_registry)
+--- a/src/server/frontend_wayland/virtual_keyboard_v1.cpp
++++ b/src/server/frontend_wayland/virtual_keyboard_v1.cpp
+@@ -31,6 +31,8 @@
+ #include "mir/log.h"
+ 
+ #include <cstring>
++#include <mutex>
++#include <unordered_map>
+ #include <sys/mman.h>
+ #include <boost/throw_exception.hpp>
+ 
+@@ -40,6 +42,9 @@
+ 
+ namespace
+ {
++std::mutex virtual_keyboard_mutex;
++std::unordered_map<MirInputDeviceId, mw::Client const*> virtual_keyboard_clients;
++
+ auto mir_keyboard_action(uint32_t wayland_state) -> MirKeyboardAction
+ {
+     switch (wayland_state)
+@@ -135,6 +140,13 @@
+ }
+ }
+ 
++bool mf::virtual_keyboard_owned_by(mw::Client const* client, MirInputDeviceId device_id)
++{
++    std::lock_guard lock{virtual_keyboard_mutex};
++    auto const entry = virtual_keyboard_clients.find(device_id);
++    return entry != virtual_keyboard_clients.end() && entry->second == client;
++}
++
+ auto mf::create_virtual_keyboard_manager_v1(
+     wl_display* display,
+     std::shared_ptr<mi::InputDeviceRegistry> const& device_registry)
+@@ -179,10 +191,20 @@
+       keyboard_device{std::make_shared<mi::VirtualInputDevice>("virtual-keyboard", mi::DeviceCapability::keyboard)},
+       device_handle{ctx->device_registry->add_device(keyboard_device)}
+ {
++    if (auto const device = device_handle.lock())
++    {
++        std::lock_guard lock{virtual_keyboard_mutex};
++        virtual_keyboard_clients.emplace(device->id(), client);
++    }
+ }
+ 
+ mf::VirtualKeyboardV1::~VirtualKeyboardV1()
+ {
++    if (auto const device = device_handle.lock())
++    {
++        std::lock_guard lock{virtual_keyboard_mutex};
++        virtual_keyboard_clients.erase(device->id());
++    }
+     ctx->device_registry->remove_device(keyboard_device);
+ }
+ 

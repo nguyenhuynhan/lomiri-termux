@@ -176,6 +176,8 @@ class AppServices(dbus.service.Object):
         home = RUNTIME / 'app-home'
         home.mkdir(mode=0o700, exist_ok=True)
         env['HOME'] = str(home)
+        if app == 'lomiri-terminal-app':
+            env['SHELL'] = '/bin/bash'
         launch_binary = str(binary)
         if app == 'lomiri-system-settings':
             env['XDG_DATA_DIRS'] = '/usr/local/share:/usr/share:' + str(RUNTIME / 'native-data')
@@ -193,6 +195,8 @@ class AppServices(dbus.service.Object):
             args = [str(binary), '--ozone-platform=wayland', '--disable-gpu', '--disable-dev-shm-usage',
                     f'--user-data-dir={RUNTIME / "vscode/user-data"}',
                     f'--extensions-dir={RUNTIME / "vscode/extensions"}', str(RUNTIME / 'code-workspace')]
+            if env.get('GTK_IM_MODULE') == 'fcitx':
+                args[1:1] = ['--enable-wayland-ime', '--wayland-text-input-version=1']
             if os.environ.get('LOMIRI_CODE_NO_SANDBOX') == '1':
                 args.insert(1, '--no-sandbox')
         elif app in ('firefox-esr', 'lomiri-chatgpt'):

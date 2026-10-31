@@ -98,7 +98,7 @@ Rectangle {
 
     Item {
         id: overview
-        anchors.right: modeButton.left
+        anchors.right: inputButton.left
         height: parent.height
         width: height
         Rectangle {
@@ -116,6 +116,26 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: dock.overviewRequested()
+        }
+    }
+
+    Rectangle {
+        id: inputButton
+        objectName: "hostInputModeButton"
+        anchors.right: modeButton.left
+        width: units.gu(5.5)
+        height: parent.height
+        color: inputTouch.pressed ? "#777780" : dock.lightMode ? "#e5e5ed" : "#30303a"
+        Text {
+            anchors.centerIn: parent
+            text: preferences.vietnameseInput ? "VN" : "EN"
+            color: preferences.vietnameseInput ? "#ee7733" : dock.lightMode ? "#242532" : "white"
+            font.pixelSize: units.gu(1.8)
+        }
+        MouseArea {
+            id: inputTouch
+            anchors.fill: parent
+            onClicked: preferences.vietnameseInput = !preferences.vietnameseInput
         }
     }
 

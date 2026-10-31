@@ -37,7 +37,19 @@ cd ~/projects/lomiri-termux
 bash scripts/demo-app.sh
 ```
 
-Trong **Hello Lomiri**, chạm nút để tăng số; chạm ô nhập rồi dùng nút hình bàn phím ở thanh Termux:X11 để mở Gboard. App là Qt/Wayland client thật trong shell.
+Trong **Hello Lomiri**, chạm nút để tăng số; chạm ô nhập để thử bàn phím. App là Qt/Wayland client thật trong shell. Nút hình bàn phím của Termux:X11 vẫn mở/đóng thủ công.
+
+Ngày 31/10/2026, cấu hình thử trên OnePlus 13 dùng **Unexpected Keyboard 2.1.0
+ở English + Fcitx5/UniKey Telex trong Debian**. Chạy `bash scripts/install-keyboard.sh`
+để cài phần Linux trên máy mới, chọn Unexpected trong Android, lưu công việc rồi
+khởi động lại Lomiri. Trong Session Settings bật **Tự hiện bàn phím** và **Tiếng Việt**;
+nút **VN/EN** trên dock đổi bộ gõ. Không dùng Ctrl+Space vì Android dùng nó để đổi IME.
+
+Chạm tự mở, gõ dấu và Backspace liên tiếp đã qua thử ADB trong Qt, Terminal,
+VSCode, ChatGPT Desktop và Firefox. Drawer/search của Lomiri chỉ nhập English,
+có thể cần mở bàn phím thủ công. Người dùng đã xác nhận trực tiếp cả tự mở,
+đúng dấu và Backspace trong Thử bàn phím. Xoay và gõ nhanh/dùng lâu còn cần kiểm chứng.
+Xem [báo cáo bàn phím](docs/keyboard-20261031.md).
 
 Bản vá input riêng cho dự án đã làm click và nhập chữ hoạt động trong các phép thử. Đã kiểm tra cả X11 click/type và thao tác qua Android, gồm phím trên Gboard. Ngày 24/10/2026, người dùng thử trực tiếp trên OnePlus 13 và xác nhận “Chạm và nhập đều được”. Một số lần chạm ADB cực ngắn không được ghi nhận; độ ổn định khi dùng lâu vẫn cần đánh giá.
 
@@ -85,7 +97,7 @@ Nút **Mobile / PC** ở mép phải dock hiển thị chế độ hiện tại;
 
 Để đóng app ở Mobile: chạm biểu tượng **hai cửa sổ chồng nhau** cạnh nút Mobile/PC để mở đa nhiệm, tìm thẻ app rồi **vuốt thẻ lên trên**. Có thể vuốt ngang để tìm app khác; chạm thẻ để quay lại app. Đổi sang app khác bằng dock chỉ chuyển cửa sổ, không đóng app cũ. App có thể hỏi lưu nội dung trước khi đóng.
 
-Đã thử tạo/lưu/chạy Python trong VSCode và kết nối audio tới Termux. Tiếng Việt có dấu qua Laban Key còn lỗi; media, báo thức, dịch vụ phần cứng và độ ổn định dài hạn chưa được coi là hoàn thiện. Xem [báo cáo kiểm chứng hiện tại](docs/verification-20261030.md). Các mục dưới bao gồm cả kết quả lịch sử.
+Đã thử tạo/lưu/chạy Python trong VSCode và kết nối audio tới Termux. Laban Key còn lỗi Backspace; cấu hình Unexpected + UniKey mới đã qua phép thử tiếng Việt/xóa chữ trong các app nêu trên. Media, báo thức, dịch vụ phần cứng và độ ổn định dài hạn chưa được coi là hoàn thiện. Xem [báo cáo kiểm chứng](docs/verification-20261030.md) và [báo cáo bàn phím](docs/keyboard-20261031.md). Các mục dưới bao gồm cả kết quả lịch sử.
 
 ## Cài đặt phiên Lomiri
 

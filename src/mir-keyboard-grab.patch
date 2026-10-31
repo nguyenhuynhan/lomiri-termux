@@ -1,0 +1,15 @@
+--- a/src/server/frontend_wayland/input_method_grab_keyboard_v2.cpp
++++ b/src/server/frontend_wayland/input_method_grab_keyboard_v2.cpp
+@@ -110,11 +110,7 @@
+ 
+ void mf::InputMethodGrabKeyboardV2::send_key(std::shared_ptr<MirKeyboardEvent const> const& event)
+ {
+-    if (!wl_client)
+-    {
+-        return;
+-    }
+-    auto const serial = wl_client.value().next_serial(event);
++    auto const serial = client->next_serial(event);
+     auto const timestamp = mir_input_event_get_wayland_timestamp(event.get());
+     int const scancode = event->scan_code();
+     auto const state = (event->action() == mir_keyboard_action_down) ?
