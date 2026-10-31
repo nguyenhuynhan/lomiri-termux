@@ -27,7 +27,7 @@ if [[ "${LOMIRI_DIRECT:-0}" == 1 ]]; then
     echo "Display $LOMIRI_DISPLAY is already in use; refusing to replace another X server." >&2
     exit 2
   fi
-  termux-x11 "$LOMIRI_DISPLAY" -tag lomiri-poc -nolisten tcp > "$PROJECT_ROOT/runtime/direct-x11.log" 2>&1 &
+  termux-x11 "$LOMIRI_DISPLAY" -tag lomiri-poc -nolisten tcp -extension MIT-SHM > "$PROJECT_ROOT/runtime/direct-x11.log" 2>&1 &
   server_pid=$!
   for ((n=0;n<40;n++)); do
     if DISPLAY="$LOMIRI_DISPLAY" xrandr --current >/dev/null 2>&1; then break; fi

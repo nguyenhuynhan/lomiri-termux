@@ -1,5 +1,28 @@
 # Nhật ký kiểm chứng
 
+## Shortcut một chạm trên màn hình chính — 2026-10-31
+
+- Ghim shortcut `~/.shortcuts/Lomiri` qua Termux:Widget. Android xác nhận pinned;
+  icon nằm ngay dưới Termux:X11. Bật quyền tạo lối tắt cho Termux:Widget;
+  quyền overlay của Termux đã cho phép ở lượt kiểm tra cuối.
+- Shortcut chạy trực tiếp `start-direct.sh`; installer tạo thêm launcher ở
+  thư mục đầu tiên của bộ chọn shortcut. Android có thể hiện Termux rất ngắn
+  trước khi chuyển sang cửa sổ X11 có tag `lomiri-poc`.
+- Lượt đầu không nhận ra PID của phiên đã khởi chạy qua ADB run-as trong
+  ngữ cảnh Android khác. Giữ kiểm tra PID, không bỏ bảo vệ danh tính. Sau khi
+  phiên cũ dừng, khởi chạy lại từ shortcut Android; controller cũng chạy trong
+  ngữ cảnh Android này. Không dùng broad kill hoặc thay SELinux.
+- Startup từ Android từng hiện màn hình đen với Mesa `Failed to attach to x11
+  shm`. Tắt extension MIT-SHM chỉ ở X server riêng của Lomiri; cold startup
+  sau đó có `LOMIRI_SHELL_READY` và shell/dock nhìn thấy trên screenshot.
+- Khi quay lại từ Home, X11 từng đen cho tới lần vẽ tiếp theo. Thêm yêu cầu
+  Expose sau mở cửa sổ, chỉ khi state direct hợp lệ và root có đúng một window
+  tên `Lomiri Termux PoC`. Thử từ Home, chạm icon một lần, chờ hai giây: shell
+  và drawer hiện, PID state giữ nguyên 29499. Bằng chứng là thao tác ADB và
+  screenshot, chưa có xác nhận thao tác tay của người dùng trong lượt này.
+- Giữ log lỗi và backup trong runtime; ảnh trong artifacts ngoài Git.
+  Không commit hoặc push.
+
 ## GPU client và kết nối lại — 2026-10-31
 
 - ADB tự kết nối lại sau khi tắt/bật Wi-Fi. Phiên chính đã dừng, PID state cũ

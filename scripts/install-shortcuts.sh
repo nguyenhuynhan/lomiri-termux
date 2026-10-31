@@ -49,6 +49,12 @@ for action, title in [('start', 'Lomiri PoC'), ('stop', 'Stop Lomiri PoC')]:
             raise RuntimeError(f'Refusing to overwrite unrelated shortcut: {file}')
         file.write_text(shortcut)
         file.chmod(0o700)
+    if action == 'start':
+        file = Path.home()/'.shortcuts/Lomiri'
+        if file.exists() and 'lomiri-termux project shortcut' not in file.read_text():
+            raise RuntimeError(f'Refusing to overwrite unrelated shortcut: {file}')
+        file.write_text(shortcut)
+        file.chmod(0o700)
 for app, name in [('code', 'VSCode (Lomiri)'), ('chatgpt', 'ChatGPT (Lomiri)')]:
     shortcut = (f'#!{prefix}/bin/bash\n# lomiri-termux project shortcut\n'
                 f'exec "{prefix}/bin/bash" "{root}/scripts/start-work-app.sh" {app}\n')

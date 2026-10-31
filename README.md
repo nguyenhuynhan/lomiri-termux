@@ -8,7 +8,7 @@ Phiên dùng Debian trixie ARM64 trong container riêng `lomiri-debian`: Lomiri 
 
 ## Mở và dừng
 
-Nhấn giữ biểu tượng **Termux:Widget**, chọn **Lomiri**. Có thể kéo shortcut này ra màn hình chính. Shortcut **Stop Lomiri** dừng riêng phiên thử. Hai shortcut đã được đăng ký trên điện thoại.
+Trên điện thoại hiện tại, chạm biểu tượng **Lomiri** ở màn hình chính, ngay dưới Termux:X11, để mở trực tiếp. Khi ghim trên máy mới: mở bộ chọn shortcut của **Termux:Widget**, chọn **Lomiri** ở thư mục đầu tiên rồi bấm **Thêm**. Cho phép Termux:Widget tạo lối tắt và cho phép Termux **Hiển thị trên ứng dụng khác** nếu Android yêu cầu. Shortcut **Stop Lomiri** dừng riêng phiên thử.
 
 Hoặc mở Termux và chạy:
 
