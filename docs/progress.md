@@ -1,5 +1,70 @@
 # Nhật ký kiểm chứng
 
+## GPU client và kết nối lại — 2026-10-31
+
+- ADB tự kết nối lại sau khi tắt/bật Wi-Fi. Phiên chính đã dừng, PID state cũ
+  không tồn tại; không tự khởi động lại phiên chính.
+- Thu 43 file log cũ và 54 file sau thử client; checksum manifest khớp. Tính lại
+  đủ 8 record timing từ log local cho kết quả trùng JSON trên phone.
+- Rút ngắn đường socket thử từ 114 xuống 94 byte bằng bản sao `runtime/gpu-zink`;
+  probe EGL chạy qua PRoot khác kết nối được. Lỗi eglInitialize trước đó có phần
+  do harness, chưa đủ để quy cho driver. Cấu hình/đường phiên chính giữ nguyên.
+- Zink client vẫn fallback llvmpipe; LIBGL_KOPPER_DRI2 không cải thiện. KGSL client
+  trong shell Zink tạo EGL context Adreno và Calculator ghi renderer Adreno,
+  nhưng Lomiri SIGSEGV khi hiện surface. Diagnostic preload xác nhận signal 11,
+  địa chỉ null, backtrace chưa chỉ ra hàm. Chưa coi app GPU là hoạt động ổn định.
+- Shell KGSL thiếu EGL_EXT_image_dma_buf_import_modifiers nên không bật dmabuf
+  import; Calculator vẫn llvmpipe. Zink shell + client software hiển thị Calculator,
+  nhập `1+2` và tiếp tục chạy đến khi chủ động dừng. Chưa kiểm chứng dài hạn.
+- Thêm client-backend/trace-crash cho script thử; ba script qua kiểm tra cú pháp.
+  Cleanup các lượt mới đã kiểm chứng; không còn process thử cũ/mới. Trả phone về
+  Android Home. Chưa đổi mặc định, commit hoặc push. Chi tiết ở
+  [kết quả GPU](gpu-results-20261031.md).
+
+## Thử GPU — tổng hợp 2026-10-31
+
+- Đã thử lần lượt VirGL, Freedreno/KGSL và Zink/Turnip trên display `:3`, tag
+  riêng và bản sao project. Cả ba đã render shell Lomiri bằng Adreno 830.
+- KGSL và Zink qua GLX/EGL với Accelerated: yes, GL 4.6/GLES 3.2. VirGL qua EGL
+  và shell, nhưng GLX timeout 25 giây; ANGLE GL thêm EGL_BAD_ACCESS.
+- Thu hai lượt menu benchmark với `QSG_RENDER_TIMING`, 672×1339: CPU median
+  30–31 ms/p95 44–45 ms; KGSL 8–9/26–32 ms; Zink 3–4/16 ms. VirGL lượt đầu
+  22/41 ms. Đây là thời gian Qt render loop, chưa phải FPS presentation.
+- KGSL/threaded chạy được nhưng không cải thiện phép thử: median 14/p95 34 ms.
+- Calculator vẫn dùng llvmpipe trong KGSL/Zink; EGL Wayland client thất bại.
+  VSCode đã hiển thị trong Zink, chưa xác nhận renderer thực tế. Mir vẫn fallback
+  software buffers. Chưa đổi backend mặc định hoặc kết luận pin/thermal.
+- Cài thêm VirGL/ANGLE; Mesa 27.0.0-devel git-eb3e7fd4f0 dùng prefix riêng với
+  artifact SHA256 đã pin, không thay thư viện hệ thống guest. Dọn process thử
+  theo identity; sửa cleanup cho broker còn sót khi startup thất bại.
+- Ngày 31/10 cần kết nối ADB lại trước khi đọc trạng thái và tiếp tục thử.
+  Chi tiết ở [kết quả GPU](gpu-results-20261031.md).
+- Kết nối lại: ADB 37.0.1 tìm được dịch vụ kết nối chính qua mDNS, nhưng TCP
+  timeout 10060; ARP điện thoại Unreachable, ping báo Destination host unreachable.
+  Chờ khôi phục đường LAN hoặc USB; chưa xác minh trạng thái phone hiện tại hay
+  thu raw log về workspace. Ba script GPU qua kiểm tra cú pháp Python tại local.
+
+## Nghiên cứu GPU/UI — 2026-10-30
+
+- Kiểm tra trực tiếp qua ADB: SM8750, Adreno830v2, Android 17; Termux có quyền
+  đọc/ghi node `/dev/kgsl-3d0`. GPU busy/frequency sysfs trả Permission denied;
+  chưa đo utilization, pin hoặc frame time khi thao tác.
+- Phiên Lomiri hiện tại và Settings dùng llvmpipe/basic; Code có `--disable-gpu`
+  và child `--use-gl=disabled`, terminal GPU off. GLX/EGL X11 trên `:2` xác nhận
+  llvmpipe LLVM 19.1.7, Mesa 25.0.7-2+deb13u1, Accelerated: no. Output hiện tại
+  672×1339, mode khoảng 59.84 Hz. Năm script ép renderer đã đối chiếu SHA256 khớp
+  giữa workspace và phone.
+- Mir 2.20.2 chọn egl-generic, nhưng log báo thiếu
+  `EGL_WL_bind_wayland_display` và fallback software buffers; dmabuf import được
+  bật chưa chứng minh app dùng buffer GPU. Host Mesa 26.2.5 không thay Mesa guest.
+- Probe libEGL/libGLESv2 Android trong process riêng tạo context/pbuffer rồi
+  giải phóng: EGL 1.5 Android, Qualcomm Adreno (TM) 830, GLES 3.2 driver
+  V@0800.80.1, build date 09/28/26. Chưa benchmark hoặc chạy Lomiri bằng GPU.
+- Đã nghiên cứu VirGL/ANGLE qua driver Android, Freedreno KGSL container và
+  Turnip/Zink A830; ghi lộ trình, nguồn và tiêu chí đo trong
+  [báo cáo GPU](gpu-performance-research-20261030.md). Chưa cài package, sửa
+  cấu hình phone, restart phiên, commit hoặc push.
+
 ## Native System Settings — 2026-10-30
 
 - Giữ Settings tự viết ở commit `69bb7ce`; đổi tên trong phiên thành
