@@ -53,6 +53,23 @@ Xem [báo cáo bàn phím](docs/keyboard-20261031.md).
 
 Bản vá input riêng cho dự án đã làm click và nhập chữ hoạt động trong các phép thử. Đã kiểm tra cả X11 click/type và thao tác qua Android, gồm phím trên Gboard. Ngày 24/10/2026, người dùng thử trực tiếp trên OnePlus 13 và xác nhận “Chạm và nhập đều được”. Một số lần chạm ADB cực ngắn không được ghi nhận; độ ổn định khi dùng lâu vẫn cần đánh giá.
 
+## ArtCraft và PhotoCraft GPU
+
+Cài ArtCraft Launcher ARM64 trong Debian riêng bằng
+`bash scripts/install-artcraft.sh`; mở từ menu **ArtCraft Launcher** hoặc
+`lomiri-artcraft` trong Termux. Các Craft apps cài qua AppImage được nhận diện
+trong catalog đọc mỗi lần mở, không cần restart shell khi thêm app.
+
+PhotoCraft 0.18.0 đã thử Vulkan/Adreno bên trong Lomiri software trên OnePlus 13.
+Với private driver đã chuẩn bị theo báo cáo GPU, chạy
+`bash scripts/install-photocraft-gpu.sh`, rồi mở **PhotoCraft** trong menu Lomiri
+hoặc `lomiri-photocraft`. GPU dựng ảnh; shared-memory presentation chuyển khung
+cho shell software. Nút Open trong ArtCraft còn dùng cấu hình CPU cũ.
+
+Xem [ArtCraft](docs/artcraft-20261031.md) và
+[PhotoCraft GPU](docs/photocraft-gpu-20261031.md) về checksum, cách dùng,
+kiểm chứng ảnh/vẽ/zoom và giới hạn hiệu năng/pin.
+
 ## VSCode và ChatGPT
 
 Đã chạy Microsoft VSCode ARM64 **1.143.1** và Firefox ESR **153.5.1** như Wayland client trong Lomiri. Phép thử đã sửa/lưu `hello.py` qua giao diện VSCode rồi chạy Python trong terminal tích hợp. ChatGPT web đã nhận `2+2` và trả lời `4` trong Firefox, chưa đăng nhập tài khoản.

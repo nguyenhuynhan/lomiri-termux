@@ -99,3 +99,20 @@ Runtime logs, profiles, configuration, and built libraries stay in ignored `runt
 Original project code is [MIT licensed](LICENSE). Installed Lomiri, Mir, QtMir, Qt, Termux, and application packages retain their upstream licenses; their binaries are not distributed here.
 
 Upstream: [Lomiri](https://gitlab.com/ubports/development/core/lomiri), [QtMir](https://gitlab.com/ubports/development/core/qtmir), [tested feeder source](https://gitlab.com/ubports/development/core/qtmir/-/blob/ea2f477/src/platforms/mirserver/qteventfeeder.cpp), [Debian package](https://packages.debian.org/trixie/lomiri).
+
+## ArtCraft and PhotoCraft GPU
+
+Install the ARM64 ArtCraft Launcher into the private Debian guest with
+`bash scripts/install-artcraft.sh`, then use the Lomiri menu or `lomiri-artcraft`.
+The adapter reads an explicit catalog for each launch and detects installed
+Craft AppImages without restarting the shell.
+
+With the tested private Turnip/KGSL driver already prepared, run
+`bash scripts/install-photocraft-gpu.sh` and open PhotoCraft from the Lomiri
+menu or `lomiri-photocraft`. PhotoCraft 0.18.0 uses Adreno Vulkan rendering
+and Wayland shared-memory presentation inside the existing software shell.
+ArtCraft's own Open button still inherits its CPU settings. The phone test
+covered opening a PNG, painting and 200% zoom; large documents, battery and
+long-term stability remain unverified. See the
+[ArtCraft](docs/artcraft-20261031.md) and
+[PhotoCraft GPU](docs/photocraft-gpu-20261031.md) reports.

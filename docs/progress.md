@@ -245,3 +245,21 @@ Mã upstream đã đọc chỉ để đối chiếu; chưa sửa hay build lại
   tự hiện bàn phím, mẫu Telex đúng dấu và Backspace năm lần xóa đúng.
   CI hosted chưa chạy tại thời điểm kiểm chứng trên thiết bị. Chi tiết trong
   [báo cáo bàn phím](keyboard-20261031.md).
+
+## 2026-10-31 — PhotoCraft GPU trong phiên Lomiri chính
+
+- PhotoCraft 0.18.0 đã cài từ ArtCraft. Cấu hình GL/llvmpipe kế thừa ban đầu
+  làm app báo softwareAdapter/all documents CPU.
+- Private Turnip/KGSL Vulkan nhận Adreno 830. `MESA_VK_WSI_DEBUG=sw` chọn
+  Wayland SHM presentation, tránh dmabuf import của compositor software.
+  PhotoCraft vẫn tạo GPU canvas; thử bản sao rồi phiên chính xác nhận PNG,
+  nét vẽ và zoom 200% hiển thị trên Android, không crash shell.
+- Thêm wrapper/desktop/catalog và `lomiri-photocraft`; UAL và tile menu đã
+  mở app mới bằng driver riêng. Lomiri PID 16241/start time 26533099 giữ nguyên.
+  Drawer còn cache tên PhotoCraft; desktop entry mới là PhotoCraft (GPU).
+  Nút Open trong ArtCraft vẫn dùng CPU, nên mở từ Lomiri để dùng GPU.
+- Đã dừng đúng supervisor/group thử `:3`, giữ primary `:2`. Profile và bộ gõ
+  chính được giữ; bỏ riêng chỉnh sửa ảnh mẫu. Không đổi Mesa hệ thống.
+- Chưa xác nhận zero-copy, hiệu năng ảnh lớn, mọi layer/filter/PSD, tiếng Việt,
+  pin, nhiệt hoặc ổn định dài hạn. Chi tiết:
+  [PhotoCraft GPU](photocraft-gpu-20261031.md). Không commit/push/publish.

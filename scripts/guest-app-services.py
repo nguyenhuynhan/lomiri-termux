@@ -17,6 +17,7 @@ import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
+from app_catalog import read_catalog
 
 ROOT = Path(__file__).resolve().parent.parent
 RUNTIME = ROOT / 'runtime'
@@ -149,8 +150,14 @@ class AppServices(dbus.service.Object):
         props = dict(properties)
         requested = dict(str(item).split('=', 1) for item in props.get('Environment', []))
         app = requested.get('APP_ID', '')
+        extra = None
+        if app not in ALLOWED:
+            try:
+                extra = read_catalog().get(app)
+            except (OSError, ValueError, TypeError) as error:
+                raise Rejected(f'Invalid private application catalog: {error}')
         commands = props.get('ExecStart', [])
-        if app not in ALLOWED or len(commands) != 1:
+        if (app not in ALLOWED and extra is None) or len(commands) != 1:
             raise Rejected(f'Application is not enabled for this PRoot session: {app}')
         binary, arguments, _ = commands[0]
         args = [str(arg) for arg in arguments]
@@ -160,6 +167,10 @@ class AppServices(dbus.service.Object):
             'firefox-esr': '/usr/bin/firefox-esr', 'lomiri-chatgpt': '/usr/bin/firefox-esr',
             'lomiri-session-settings': '/usr/bin/python3',
         }.get(app, '/usr/bin/' + app)
+        if extra:
+            expected = extra['executable']
+            if args != [str(binary)]:
+                raise Rejected('Catalog applications do not accept extra launch arguments')
         if resolved != Path(expected).resolve():
             raise Rejected(f'Unexpected executable for {app}: {binary}')
         if app == 'lomiri-session-settings' and args != [str(binary), str(ROOT / 'scripts/guest-settings.py')]:
@@ -178,6 +189,8 @@ class AppServices(dbus.service.Object):
         env['HOME'] = str(home)
         if app == 'lomiri-terminal-app':
             env['SHELL'] = '/bin/bash'
+        if extra:
+            env.update(extra['environment'])
         launch_binary = str(binary)
         if app == 'lomiri-system-settings':
             env['XDG_DATA_DIRS'] = '/usr/local/share:/usr/share:' + str(RUNTIME / 'native-data')
